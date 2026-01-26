@@ -1,2 +1,84 @@
-"/* Objective: MVP styles for chat, upload, and visualization layout. */
-"
+""/* Objective: MVP styles for chat, upload, and visualization layout. */
+#chat-container {
+    width: 300px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+#chat-history {
+    height: 500px;
+    overflow-y: scroll;
+    border: 1px solid #eee;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.message {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+    padding: 8px 12px;
+    border-radius: 10px;
+    width: fit-content;
+}
+
+.message.bot {
+    background: #f0f0f0;
+    justify-content: flex-start;
+    align-self: flex-start;
+}
+
+.message.user {
+    background: #007bff;
+    color: white;
+    justify-content: flex-end;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.photo {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.message.user .photo {
+    order: 2;
+    margin-left: 10px;
+    margin-right: 0;
+}
+
+.message.user span:first-child {
+    order: 1;
+}
+
+#user-input {
+    height: 60px;
+    resize: none;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#skills-editor textarea {
+    width: 100%;
+    height: 80px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
