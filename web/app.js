@@ -1,5 +1,5 @@
 // Objective: browser-side logic for chat, upload, and rendering profile data.
-let isFirstMessage = true;
+let currentStep = 'ask_roadmap';
 
 function appendMessage(text, type) {
     const chatHistory = document.getElementById('chat-history');
@@ -24,19 +24,33 @@ window.addEventListener('DOMContentLoaded', function() {
 
 document.getElementById('send-button').addEventListener('click', function() {
     const userInput = document.getElementById('user-input');
-    const text = userInput.value.trim();
+    const text = userInput.value.trim().toLowerCase();
     if (text) {
-        appendMessage(text, 'user');
+        appendMessage(userInput.value.trim(), 'user');
         userInput.value = '';
-        if (isFirstMessage) {
-            if (text.toLowerCase() === 'yes') {
-                appendMessage('Please update your resume.', 'bot');
-                isFirstMessage = false;
-            } else if (text.toLowerCase() === 'no') {
+        if (currentStep === 'ask_roadmap') {
+            if (text === 'yes') {
+                appendMessage('Is your resume up to date?', 'bot');
+                currentStep = 'ask_resume_up_to_date';
+            } else if (text === 'no') {
                 appendMessage('Thank you. Please let me know when you want one.', 'bot');
-                isFirstMessage = false;
+                currentStep = 'done';
             } else {
                 appendMessage('Please answer with "yes" or "no". Would you like to have a career development roadmap?', 'bot');
+            }
+        } else if (currentStep === 'ask_resume_up_to_date') {
+            if (text === 'yes') {
+                appendMessage('Great! Since your resume is up to date, we can proceed with your current skills.', 'bot');
+                // TODO: Call backend API to get information from existing resume
+                appendMessage('Part I: Skill Set.', 'bot');
+                appendMessage('Here are your skills. Please edit if necessary.', 'bot');
+                document.getElementById('skills-editor').style.display = 'block';
+                currentStep = 'skills';
+            } else if (text === 'no') {
+                appendMessage('Please upload your resume.', 'bot');
+                currentStep = 'wait_upload';
+            } else {
+                appendMessage('Please answer with "yes" or "no". Is your resume up to date?', 'bot');
             }
         }
     }
@@ -49,9 +63,11 @@ document.getElementById('upload-button').addEventListener('click', function() {
         appendMessage('Uploaded: ' + file.name, 'bot');
         // TODO: Store the file and send to backend API for processing
         appendMessage('Thank you for updating your resume. Please follow the following steps to continue. ', 'bot');
+        // TODO: Call backend API to parse resume and get skills
         appendMessage('Part I: Skill Set.', 'bot');
         appendMessage('After parsing your resume, here are your skills. Please edit it if necessary.', 'bot');
         document.getElementById('skills-editor').style.display = 'block';
+        currentStep = 'skills';
     }
 });
 
