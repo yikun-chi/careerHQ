@@ -1,3 +1,3 @@
-"Domain package placeholder.
-Objective: define core entities such as profiles and resumes.
-"
+"""Domain package placeholder.
+Objective: define domain entities and value objects.
+"""

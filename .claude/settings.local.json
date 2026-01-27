@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(conda:*)",
+      "Bash(python:*)",
+      "Bash(\"/c/Users/yikun/AppData/Local/Microsoft/WindowsApps/python.exe\" tests/test_job_initialize.py)",
+      "Bash(/c/ProgramData/anaconda3/python.exe:*)"
+    ]
+  }
+}
