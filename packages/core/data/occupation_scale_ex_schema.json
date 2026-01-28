@@ -1,0 +1,13 @@
+{
+    "scale_id": "EX",
+    "scale_name": "Extent",
+    "scale_type": "interval",
+    "min_value": 1,
+    "max_value": 7,
+    "meaning": "The extent to which the element is relevant to the occupation. Higher values indicate greater relevance and importance of the element for performing the occupation.",
+    "interpretation": {
+        "low": "Element has minimal relevance to this occupation",
+        "mid": "Element has moderate relevance to this occupation",
+        "high": "Element has high relevance to this occupation"
+    }
+}

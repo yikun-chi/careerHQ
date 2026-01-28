@@ -1,0 +1,13 @@
+{
+    "scale_id": "OI",
+    "scale_name": "Occupational Interests",
+    "scale_type": "interval",
+    "min_value": 1,
+    "max_value": 7,
+    "meaning": "How characteristic a particular interest is for an occupation. Higher values indicate the interest is more characteristic and descriptive of the occupation.",
+    "interpretation": {
+        "low": "Interest is not characteristic of this occupation",
+        "mid": "Interest is moderately characteristic of this occupation",
+        "high": "Interest is highly characteristic of this occupation"
+    }
+}
