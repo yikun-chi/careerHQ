@@ -4,7 +4,16 @@
       "Bash(conda:*)",
       "Bash(python:*)",
       "Bash(\"/c/Users/yikun/AppData/Local/Microsoft/WindowsApps/python.exe\" tests/test_job_initialize.py)",
-      "Bash(/c/ProgramData/anaconda3/python.exe:*)"
+      "Bash(/c/ProgramData/anaconda3/python.exe:*)",
+      "Bash(py -m pytest tests/test_job_initialize.py -v -s)",
+      "Bash(py tests/test_job_initialize.py)",
+      "Bash(/c/Users/yikun/anaconda3/python.exe -m pytest:*)",
+      "Bash(/c/Users/yikun/miniconda3/python.exe -m pytest:*)",
+      "Bash(cmd.exe /c \"cd /d c:\\\\Users\\\\yikun\\\\Documents\\\\GitHub\\\\careerHQ && python -m pytest tests/test_job_initialize.py -v -s\")",
+      "Bash(powershell.exe -Command \"cd ''c:\\\\Users\\\\yikun\\\\Documents\\\\GitHub\\\\careerHQ''; python -m pytest tests/test_job_initialize.py -v -s\")",
+      "Bash(powershell.exe -Command \"& ''C:\\\\Users\\\\yikun\\\\anaconda3\\\\shell\\\\condabin\\\\conda-hook.ps1''; conda activate base; cd ''c:\\\\Users\\\\yikun\\\\Documents\\\\GitHub\\\\careerHQ''; python -m pytest tests/test_job_initialize.py -v -s\")",
+      "Bash(pytest:*)",
+      "Bash(echo:*)"
     ]
   }
 }

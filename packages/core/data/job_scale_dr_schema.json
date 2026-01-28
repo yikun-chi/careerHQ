@@ -1,0 +1,21 @@
+{
+    "scale_id": "DR",
+    "scale_name": "Distinctiveness Rank",
+    "scale_type": "ordinal",
+    "min_value": 0,
+    "max_value": 10,
+    "meaning": "The distinctiveness rank of a Work Style for an occupation, presenting up to 10 beneficial Work Styles which distinguish an occupation from others.",
+    "categories": {
+        "0": "Not in ranked list (Work Style is not distinctive for this occupation)",
+        "1": "1st most distinctive Work Style",
+        "2": "2nd most distinctive Work Style",
+        "3": "3rd most distinctive Work Style",
+        "4": "4th most distinctive Work Style",
+        "5": "5th most distinctive Work Style",
+        "6": "6th most distinctive Work Style",
+        "7": "7th most distinctive Work Style",
+        "8": "8th most distinctive Work Style",
+        "9": "9th most distinctive Work Style",
+        "10": "10th most distinctive Work Style"
+    }
+}

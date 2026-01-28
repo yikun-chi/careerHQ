@@ -18,6 +18,7 @@ from .job_class import (
     OrganizationNode,
     ScaleDefinition,
     ScaleType,
+    Element,
 )
 
 
@@ -109,6 +110,74 @@ def load_organization_registry(file_path: Optional[Path] = None) -> Organization
     return OrganizationRegistry(nodes=final_org_nodes)
 
 
+def load_elements(file_path: Optional[Path] = None) -> Dict[str, Element]:
+    """
+    Load all leaf elements from the O*NET Content Model hierarchy.
+
+    Leaf elements are those that don't have any children in the hierarchy.
+    These are the actual measurable attributes (e.g., "1.A.1.a.1 Oral Comprehension")
+    as opposed to organization nodes which are categories (e.g., "1.A Abilities").
+
+    Parameters
+    ----------
+    file_path : Optional[Path]
+        Path to Content Model Reference.txt. If None, uses default location.
+
+    Returns
+    -------
+    Dict[str, Element]
+        Dictionary mapping element_id to Element objects (without scales populated).
+    """
+    if file_path is None:
+        file_path = get_data_dir() / "Content Model Reference.txt"
+
+    # First pass: Read all entries and track which IDs exist
+    all_entries: Dict[str, Tuple[str, Optional[str]]] = {}
+    all_ids: Set[str] = set()
+
+    with open(file_path, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f, delimiter='\t')
+        next(reader)  # Skip header
+
+        for row in reader:
+            if len(row) < 2:
+                continue
+
+            element_id = row[0].strip()
+            element_name = row[1].strip()
+            description = row[2].strip() if len(row) > 2 else None
+
+            if not element_id or not element_name:
+                continue
+
+            all_entries[element_id] = (element_name, description)
+            all_ids.add(element_id)
+
+    # Second pass: Identify parent IDs (those that have children)
+    parent_ids: Set[str] = set()
+    for element_id in all_ids:
+        parts = element_id.split(".")
+        # Add all prefixes as parent IDs
+        for i in range(1, len(parts)):
+            prefix = ".".join(parts[:i])
+            parent_ids.add(prefix)
+
+    # Leaf elements are those that are NOT parents (have no children)
+    leaf_ids = all_ids - parent_ids
+
+    # Build Element objects for leaf nodes
+    elements: Dict[str, Element] = {}
+    for element_id in leaf_ids:
+        if element_id in all_entries:
+            element_name, _description = all_entries[element_id]
+            elements[element_id] = Element(
+                element_id=element_id,
+                element_name=element_name,
+            )
+
+    return elements
+
+
 def load_scale_definitions(file_path: Optional[Path] = None) -> Dict[str, ScaleDefinition]:
     """
     Load scale definitions from job_scale_reference.txt or job_scale_def.csv.
@@ -185,6 +254,7 @@ def load_scale_definitions(file_path: Optional[Path] = None) -> Dict[str, ScaleD
 # Global registries (initialized on first import)
 _ORGANIZATION_REGISTRY: Optional[OrganizationRegistry] = None
 _SCALE_DEFINITIONS: Optional[Dict[str, ScaleDefinition]] = None
+_ELEMENTS: Optional[Dict[str, Element]] = None
 
 
 def get_organization_registry() -> OrganizationRegistry:
@@ -203,16 +273,24 @@ def get_scale_definitions() -> Dict[str, ScaleDefinition]:
     return _SCALE_DEFINITIONS
 
 
-def initialize_all() -> Tuple[OrganizationRegistry, Dict[str, ScaleDefinition]]:
+def get_elements() -> Dict[str, Element]:
+    """Get or initialize the global elements dictionary."""
+    global _ELEMENTS
+    if _ELEMENTS is None:
+        _ELEMENTS = load_elements()
+    return _ELEMENTS
+
+
+def initialize_all() -> Tuple[OrganizationRegistry, Dict[str, ScaleDefinition], Dict[str, Element]]:
     """
     Initialize all registries and return them.
 
     Returns
     -------
-    Tuple[OrganizationRegistry, Dict[str, ScaleDefinition]]
-        The organization registry and scale definitions.
+    Tuple[OrganizationRegistry, Dict[str, ScaleDefinition], Dict[str, Element]]
+        The organization registry, scale definitions, and elements.
     """
-    return get_organization_registry(), get_scale_definitions()
+    return get_organization_registry(), get_scale_definitions(), get_elements()
 
 
 # Auto-initialize on module import
