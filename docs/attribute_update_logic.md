@@ -14,9 +14,11 @@ Each `UserAttribute` has three value fields:
 
 | Field | Type | Range | Description |
 |-------|------|-------|-------------|
-| `capability` | int | 0-100 | User's experience/skill level in this attribute |
-| `preference` | int | 0-100 | User's preference for work involving this attribute |
+| `capability` | float | 0-100 | User's experience/skill level in this attribute |
+| `preference` | float | 0-100 | User's preference for work involving this attribute |
 | `binary` | bool | True/False | Categorical flag (used for education/training levels) |
+
+**Note:** Capability and preference are stored as floats to preserve precision during accumulation across multiple jobs. When displaying to users, consider rounding to 1-2 decimal places.
 
 ## Update Formulas
 

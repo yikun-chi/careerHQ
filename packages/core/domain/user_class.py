@@ -88,8 +88,8 @@ class UserAttribute:
     mapping_element_id: Optional[str] = None
     element_name: Optional[str] = None
     description: Optional[str] = None
-    capability: Optional[int] = None
-    preference: Optional[int] = None
+    capability: Optional[float] = None
+    preference: Optional[float] = None
     binary: Optional[bool] = None
 
     # Derived taxonomy prefixes: ("1", "1.A", "1.A.1", "1.A.1.a")
@@ -125,14 +125,14 @@ class UserAttribute:
             ValueError: If capability or preference is outside the valid range.
         """
         if self.capability is not None:
-            if not isinstance(self.capability, int) or not (0 <= self.capability <= 100):
+            if not isinstance(self.capability, (int, float)) or not (0 <= self.capability <= 100):
                 raise ValueError(
-                    f"capability must be an integer between 0 and 100, got {self.capability}"
+                    f"capability must be a number between 0 and 100, got {self.capability}"
                 )
         if self.preference is not None:
-            if not isinstance(self.preference, int) or not (0 <= self.preference <= 100):
+            if not isinstance(self.preference, (int, float)) or not (0 <= self.preference <= 100):
                 raise ValueError(
-                    f"preference must be an integer between 0 and 100, got {self.preference}"
+                    f"preference must be a number between 0 and 100, got {self.preference}"
                 )
 
 

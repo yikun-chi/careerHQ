@@ -160,13 +160,13 @@ def update_attributes_with_element_mapping(
 
         # Update capability (cumulative, capped at 100)
         capability_delta = years * experience_score
-        current_capability = attr.capability or 0
-        attr.capability = min(100, current_capability + int(capability_delta))
+        current_capability = attr.capability or 0.0
+        attr.capability = min(100.0, current_capability + capability_delta)
 
         # Update preference (cumulative, capped at 100)
         preference_delta = years * 2
-        current_preference = attr.preference or 0
-        attr.preference = min(100, current_preference + int(preference_delta))
+        current_preference = attr.preference or 0.0
+        attr.preference = min(100.0, current_preference + preference_delta)
 
 
 def _get_job_years(job: Job) -> float:
