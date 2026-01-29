@@ -93,8 +93,8 @@ class TestOrganizationRegistry:
         """Test looking up specific organization nodes."""
         org_registry = get_organization_registry()
 
-        # These top-level categories should exist
-        expected_ids = ["1", "1.A", "2", "2.A", "4"]
+        # These top-level categories should exist (only 1, 2, 3 after filtering)
+        expected_ids = ["1", "1.A", "2", "2.A", "3"]
 
         print("\nSample organization nodes:")
         print("-" * 60)

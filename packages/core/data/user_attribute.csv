@@ -1,0 +1,308 @@
+Attribute ID,Attribute Name,Element ID,Element Name,Description
+1,Worker Innate Characteristics,1,Worker Characteristics,Worker Characteristics
+1.A,Abilities,1.A,Abilities,Enduring attributes of the individual that influence performance
+1.A.1,Cognitive Abilities,1.A.1,Cognitive Abilities,Abilities that influence the acquisition and application of knowledge in problem solving
+1.A.1.a,Verbal Abilities,1.A.1.a,Verbal Abilities,Abilities that influence the acquisition and application of verbal information in problem solving
+1.A.1.a.1,Oral Comprehension,1.A.1.a.1,Oral Comprehension,The ability to listen to and understand information and ideas presented through spoken words and sentences.
+1.A.1.a.2,Written Comprehension,1.A.1.a.2,Written Comprehension,The ability to read and understand information and ideas presented in writing.
+1.A.1.a.3,Oral Expression,1.A.1.a.3,Oral Expression,The ability to communicate information and ideas in speaking so others will understand.
+1.A.1.a.4,Written Expression,1.A.1.a.4,Written Expression,The ability to communicate information and ideas in writing so others will understand.
+1.A.1.b,Idea Generation and Reasoning Abilities,1.A.1.b,Idea Generation and Reasoning Abilities,Abilities that influence the application and manipulation of information in problem solving
+1.A.1.b.1,Fluency of Ideas,1.A.1.b.1,Fluency of Ideas,"The ability to come up with a number of ideas about a topic (the number of ideas is important, not their quality, correctness, or creativity)."
+1.A.1.b.2,Originality,1.A.1.b.2,Originality,"The ability to come up with unusual or clever ideas about a given topic or situation, or to develop creative ways to solve a problem."
+1.A.1.b.3,Problem Sensitivity,1.A.1.b.3,Problem Sensitivity,"The ability to tell when something is wrong or is likely to go wrong. It does not involve solving the problem, only recognizing that there is a problem."
+1.A.1.b.4,Deductive Reasoning,1.A.1.b.4,Deductive Reasoning,The ability to apply general rules to specific problems to produce answers that make sense.
+1.A.1.b.5,Inductive Reasoning,1.A.1.b.5,Inductive Reasoning,The ability to combine pieces of information to form general rules or conclusions (includes finding a relationship among seemingly unrelated events).
+1.A.1.b.6,Information Ordering,1.A.1.b.6,Information Ordering,"The ability to arrange things or actions in a certain order or pattern according to a specific rule or set of rules (e.g., patterns of numbers, letters, words, pictures, mathematical operations)."
+1.A.1.b.7,Category Flexibility,1.A.1.b.7,Category Flexibility,The ability to generate or use different sets of rules for combining or grouping things in different ways.
+1.A.1.c,Quantitative Abilities,1.A.1.c,Quantitative Abilities,Abilities that influence the solution of problems involving mathematical relationships
+1.A.1.c.1,Mathematical Reasoning,1.A.1.c.1,Mathematical Reasoning,The ability to choose the right mathematical methods or formulas to solve a problem.
+1.A.1.c.2,Number Facility,1.A.1.c.2,Number Facility,"The ability to add, subtract, multiply, or divide quickly and correctly."
+1.A.1.d,Memory,1.A.1.d,Memory,Abilities related to the recall of available information
+1.A.1.d.1,Memorization,1.A.1.d.1,Memorization,"The ability to remember information such as words, numbers, pictures, and procedures."
+1.A.1.e,Perceptual Abilities,1.A.1.e,Perceptual Abilities,Abilities related to the acquisition and organization of visual information
+1.A.1.e.1,Speed of Closure,1.A.1.e.1,Speed of Closure,"The ability to quickly make sense of, combine, and organize information into meaningful patterns."
+1.A.1.e.2,Flexibility of Closure,1.A.1.e.2,Flexibility of Closure,"The ability to identify or detect a known pattern (a figure, object, word, or sound) that is hidden in other distracting material."
+1.A.1.e.3,Perceptual Speed,1.A.1.e.3,Perceptual Speed,"The ability to quickly and accurately compare similarities and differences among sets of letters, numbers, objects, pictures, or patterns. The things to be compared may be presented at the same time or one after the other. This ability also includes comparing a presented object with a remembered object."
+1.A.1.f,Spatial Abilities,1.A.1.f,Spatial Abilities,Abilities related to the manipulation and organization of spatial information
+1.A.1.f.1,Spatial Orientation,1.A.1.f.1,Spatial Orientation,The ability to know your location in relation to the environment or to know where other objects are in relation to you.
+1.A.1.f.2,Visualization,1.A.1.f.2,Visualization,The ability to imagine how something will look after it is moved around or when its parts are moved or rearranged.
+1.A.1.g,Attentiveness,1.A.1.g,Attentiveness,Abilities related to application of attention
+1.A.1.g.1,Selective Attention,1.A.1.g.1,Selective Attention,The ability to concentrate on a task over a period of time without being distracted.
+1.A.1.g.2,Time Sharing,1.A.1.g.2,Time Sharing,"The ability to shift back and forth between two or more activities or sources of information (such as speech, sounds, touch, or other sources)."
+1.A.2,Psychomotor Abilities,1.A.2,Psychomotor Abilities,Abilities that influence the capacity to manipulate and control objects
+1.A.2.a,Fine Manipulative Abilities,1.A.2.a,Fine Manipulative Abilities,Abilities related to the manipulation of objects
+1.A.2.a.1,Arm-Hand Steadiness,1.A.2.a.1,Arm-Hand Steadiness,The ability to keep your hand and arm steady while moving your arm or while holding your arm and hand in one position.
+1.A.2.a.2,Manual Dexterity,1.A.2.a.2,Manual Dexterity,"The ability to quickly move your hand, your hand together with your arm, or your two hands to grasp, manipulate, or assemble objects."
+1.A.2.a.3,Finger Dexterity,1.A.2.a.3,Finger Dexterity,"The ability to make precisely coordinated movements of the fingers of one or both hands to grasp, manipulate, or assemble very small objects."
+1.A.2.b,Control Movement Abilities,1.A.2.b,Control Movement Abilities,Abilities related to the control and manipulation of objects in time and space
+1.A.2.b.1,Control Precision,1.A.2.b.1,Control Precision,The ability to quickly and repeatedly adjust the controls of a machine or a vehicle to exact positions.
+1.A.2.b.2,Multilimb Coordination,1.A.2.b.2,Multilimb Coordination,"The ability to coordinate two or more limbs (for example, two arms, two legs, or one leg and one arm) while sitting, standing, or lying down. It does not involve performing the activities while the whole body is in motion."
+1.A.2.b.3,Response Orientation,1.A.2.b.3,Response Orientation,"The ability to choose quickly between two or more movements in response to two or more different signals (lights, sounds, pictures). It includes the speed with which the correct response is started with the hand, foot, or other body part."
+1.A.2.b.4,Rate Control,1.A.2.b.4,Rate Control,The ability to time your movements or the movement of a piece of equipment in anticipation of changes in the speed and/or direction of a moving object or scene.
+1.A.2.c,Reaction Time and Speed Abilities,1.A.2.c,Reaction Time and Speed Abilities,Abilities related to speed of manipulation of objects
+1.A.2.c.1,Reaction Time,1.A.2.c.1,Reaction Time,"The ability to quickly respond (with the hand, finger, or foot) to a signal (sound, light, picture) when it appears."
+1.A.2.c.2,Wrist-Finger Speed,1.A.2.c.2,Wrist-Finger Speed,"The ability to make fast, simple, repeated movements of the fingers, hands, and wrists."
+1.A.2.c.3,Speed of Limb Movement,1.A.2.c.3,Speed of Limb Movement,The ability to quickly move the arms and legs.
+1.A.3,Physical Abilities,1.A.3,Physical Abilities,"Abilities that influence strength, endurance, flexibility, balance and coordination"
+1.A.3.a,Physical Strength Abilities,1.A.3.a,Physical Strength Abilities,Abilities related to the capacity to exert force
+1.A.3.a.1,Static Strength,1.A.3.a.1,Static Strength,"The ability to exert maximum muscle force to lift, push, pull, or carry objects."
+1.A.3.a.2,Explosive Strength,1.A.3.a.2,Explosive Strength,"The ability to use short bursts of muscle force to propel oneself (as in jumping or sprinting), or to throw an object."
+1.A.3.a.3,Dynamic Strength,1.A.3.a.3,Dynamic Strength,The ability to exert muscle force repeatedly or continuously over time. This involves muscular endurance and resistance to muscle fatigue.
+1.A.3.a.4,Trunk Strength,1.A.3.a.4,Trunk Strength,"The ability to use your abdominal and lower back muscles to support part of the body repeatedly or continuously over time without ""giving out"" or fatiguing."
+1.A.3.b,Endurance,1.A.3.b,Endurance,The ability to exert oneself physically over long periods without getting out of breath
+1.A.3.b.1,Stamina,1.A.3.b.1,Stamina,The ability to exert yourself physically over long periods of time without getting winded or out of breath.
+1.A.3.c,"Flexibility, Balance, and Coordination",1.A.3.c,"Flexibility, Balance, and Coordination",Abilities related to the control of gross body movements
+1.A.3.c.1,Extent Flexibility,1.A.3.c.1,Extent Flexibility,"The ability to bend, stretch, twist, or reach with your body, arms, and/or legs."
+1.A.3.c.2,Dynamic Flexibility,1.A.3.c.2,Dynamic Flexibility,"The ability to quickly and repeatedly bend, stretch, twist, or reach out with your body, arms, and/or legs."
+1.A.3.c.3,Gross Body Coordination,1.A.3.c.3,Gross Body Coordination,"The ability to coordinate the movement of your arms, legs, and torso together when the whole body is in motion."
+1.A.3.c.4,Gross Body Equilibrium,1.A.3.c.4,Gross Body Equilibrium,The ability to keep or regain your body balance or stay upright when in an unstable position.
+1.A.4,Sensory Abilities,1.A.4,Sensory Abilities,"Abilities that influence visual, auditory and speech perception"
+1.A.4.a,Visual Abilities,1.A.4.a,Visual Abilities,Abilities related to visual sensory input
+1.A.4.a.1,Near Vision,1.A.4.a.1,Near Vision,The ability to see details at close range (within a few feet of the observer).
+1.A.4.a.2,Far Vision,1.A.4.a.2,Far Vision,The ability to see details at a distance.
+1.A.4.a.3,Visual Color Discrimination,1.A.4.a.3,Visual Color Discrimination,"The ability to match or detect differences between colors, including shades of color and brightness."
+1.A.4.a.4,Night Vision,1.A.4.a.4,Night Vision,The ability to see under low-light conditions.
+1.A.4.a.5,Peripheral Vision,1.A.4.a.5,Peripheral Vision,The ability to see objects or movement of objects to one's side when the eyes are looking ahead.
+1.A.4.a.6,Depth Perception,1.A.4.a.6,Depth Perception,"The ability to judge which of several objects is closer or farther away from you, or to judge the distance between you and an object."
+1.A.4.a.7,Glare Sensitivity,1.A.4.a.7,Glare Sensitivity,The ability to see objects in the presence of a glare or bright lighting.
+1.A.4.b,Auditory and Speech Abilities,1.A.4.b,Auditory and Speech Abilities,Abilities related to auditory and oral input
+1.A.4.b.1,Hearing Sensitivity,1.A.4.b.1,Hearing Sensitivity,The ability to detect or tell the differences between sounds that vary in pitch and loudness.
+1.A.4.b.2,Auditory Attention,1.A.4.b.2,Auditory Attention,The ability to focus on a single source of sound in the presence of other distracting sounds.
+1.A.4.b.3,Sound Localization,1.A.4.b.3,Sound Localization,The ability to tell the direction from which a sound originated.
+1.A.4.b.4,Speech Recognition,1.A.4.b.4,Speech Recognition,The ability to identify and understand the speech of another person.
+1.A.4.b.5,Speech Clarity,1.A.4.b.5,Speech Clarity,The ability to speak clearly so others can understand you.
+1.D,Work Styles,1.D,Work Styles,"Personality tendencies exhibited at work, which can affect how well someone performs a job."
+1.D.1,Proactive and Growth Oriented,1.D.1,Proactive and Growth Oriented,"A tendency to proactively pursue excellence through setting high standards, engaging in continuous learning, and persisting and adapting in the face of challenges and uncertainty at work."
+1.D.1.a,Innovation,1.D.1.a,Innovation,"A tendency to be inventive, to be imaginative, and to adopt new perspectives on ways to accomplish work."
+1.D.1.b,Achievement Orientation,1.D.1.b,Achievement Orientation,"A tendency to establish and maintain personally challenging work-related goals, set high work-related standards, and exert high effort toward meeting those goals and standards."
+1.D.1.c,Intellectual Curiosity,1.D.1.c,Intellectual Curiosity,A tendency to seek out and acquire new work-related knowledge and obtain a deep understanding of work-related subjects.
+1.D.1.d,Tolerance for Ambiguity,1.D.1.d,Tolerance for Ambiguity,A tendency to be comfortable with ambiguity and uncertainty at work.
+1.D.1.e,Initiative,1.D.1.e,Initiative,A tendency to be proactive and take on extra responsibilities and tasks that may fall outside of one's required work role.
+1.D.1.f,Adaptability,1.D.1.f,Adaptability,"A tendency to be open to and comfortable with change, new experiences, or ideas at work."
+1.D.1.g,Self-Confidence,1.D.1.g,Self-Confidence,A tendency to believe in one's work-related capabilities and ability to control one's work-related outcomes.
+1.D.1.h,Perseverance,1.D.1.h,Perseverance,A tendency to exhibit determination and resolve to perform or complete tasks in the face of difficult circumstances or obstacles at work.
+1.D.1.i,Leadership Orientation,1.D.1.i,Leadership Orientation,"A tendency to lead, take charge, offer opinions, and provide direction at work."
+1.D.2,Interpersonally Oriented,1.D.2,Interpersonally Oriented,"A tendency to engage with others in a positive, supportive, selfless, and considerate manner at work."
+1.D.2.a,Humility,1.D.2.a,Humility,A tendency to be modest and humble when interacting with others at work.
+1.D.2.b,Sincerity,1.D.2.b,Sincerity,"A tendency to be genuine and sincere in interactions with others at work, without concern for personal gain or self-interest."
+1.D.2.c,Empathy,1.D.2.c,Empathy,A tendency to show concern for others and be sensitive to others' needs and feelings at work.
+1.D.2.d,Cooperation,1.D.2.d,Cooperation,"A tendency to be pleasant, helpful, and willing to assist others at work."
+1.D.2.e,Optimism,1.D.2.e,Optimism,"A tendency to exhibit a positive attitude and positive emotions at work, even under difficult circumstances."
+1.D.2.f,Social Orientation,1.D.2.f,Social Orientation,"A tendency to seek out, enjoy, and be energized by social interaction at work."
+1.D.3,Conscientious and Rule Oriented,1.D.3,Conscientious and Rule Oriented,"A tendency to approach work with careful attention to quality, reliability, and ethical standards while maintaining organized and thorough work practices."
+1.D.3.a,Cautiousness,1.D.3.a,Cautiousness,"A tendency to be careful, deliberate, and risk-avoidant when making work-related decisions or doing work."
+1.D.3.b,Attention to Detail,1.D.3.b,Attention to Detail,"A tendency to be detail-oriented, organized, and thorough in completing work."
+1.D.3.c,Dependability,1.D.3.c,Dependability,"A tendency to be reliable, responsible, and consistent in meeting work-related obligations."
+1.D.3.d,Integrity,1.D.3.d,Integrity,A tendency to be honest and ethical at work.
+1.D.4,Emotionally Resilient,1.D.4,Emotionally Resilient,"A tendency to maintain emotional stability and cope effectively in the face of adversity, criticism, or high-pressure situations at work."
+1.D.4.a,Stress Tolerance,1.D.4.a,Stress Tolerance,A tendency to cope and function effectively in stressful situations at work.
+1.D.4.b,Self-Control,1.D.4.b,Self-Control,A tendency to remain calm and composed and to manage emotions effectively in response to criticism or difficult situations at work.
+1.N,Custom added worker innate characteristics,,,
+1.N.1,Age,,,How old someone is (number)
+1.N.2,Personality,,,"A collection of specific, consistent traits that group together a person’s typical ways of thinking, feeling, and acting because those behaviors follow a similar pattern and represent a core part of their character"
+1.N.2.a,INTJ,,,"A tendency to be strategic, independent, and highly organized, focusing on long-term goals and complex systems."
+1.N.2.b,INTP,,,"A tendency to be analytical, objective, and intellectually curious, prioritizing logic and abstract problem-solving."
+1.N.2.c,ENTJ,,,"A tendency to lead with decisiveness and efficiency, focusing on organizing people and resources to achieve large-scale objectives."
+1.N.2.d,ENTP,,,"A tendency to be innovative, intellectually adaptable, and energized by exploring new ideas and challenging the status quo."
+1.N.2.e,INFJ,,,"A tendency to be insightful, principled, and compassionate, seeking deep meaning and harmony in human connections."
+1.N.2.f,INFP,,,"A tendency to be idealistic, empathetic, and guided by strong personal values and a desire for creative self-expression."
+1.N.2.g,ENFJ,,,"A tendency to be charismatic, persuasive, and altruistic, focused on inspiring others and fostering collective growth."
+1.N.2.h,ENFP,,,"A tendency to be enthusiastic, creative, and sociable, energized by possibilities and making meaningful emotional connections."
+1.N.2.i,ISTJ,,,"A tendency to be responsible, detail-oriented, and dependable, prioritizing traditional structures and factual accuracy."
+1.N.2.j,ISFJ,,,"A tendency to be dedicated, warm, and protective, focused on providing practical support and maintaining stability for others."
+1.N.2.k,ESTJ,,,"A tendency to be organized, traditional, and direct, focusing on managing tasks and people through clear rules and expectations."
+1.N.2.l,ESFJ,,,"A tendency to be helpful, social, and cooperative, prioritizing the needs of the community and maintaining social harmony."
+1.N.2.m,ISTP,,,"A tendency to be observant, pragmatic, and technically skilled, enjoying hands-on problem-solving and troubleshooting."
+1.N.2.n,ISFP,,,"A tendency to be sensitive, artistic, and flexible, focusing on experiencing the present moment and staying true to personal aesthetics."
+1.N.2.o,ESTP,,,"A tendency to be energetic, perceptive, and action-oriented, thriving in fast-paced environments and immediate challenges."
+1.N.2.p,ESFP,,,"A tendency to be spontaneous, playful, and engaging, energized by social interaction and bringing excitement to those around them."
+2,"Worker Education, Training, and Experience",,,
+2.D,Education,2.D,Education,Prior educational experience required to perform in a job
+2.D.1,Required Level of Education,2.D.1,Required Level of Education,The level of education
+2.D.1.1,Less than a High School Diploma,2.D.1,Required Level of Education,If user's education level is : Less than a High School Diploma
+2.D.1.2,"High School Diploma - or the equivalent (for example, GED)",2.D.1,Required Level of Education,"If user's education level is : High School Diploma - or the equivalent (for example, GED)"
+2.D.1.3,"Post-Secondary Certificate - awarded for training completed after high school (for example, in agriculture or natural resources, computer services, personal or culinary services, engineering technologies, healthcare, construction trades, mechanic and repair technologies, or precision production)",2.D.1,Required Level of Education,"If user's education level is : Post-Secondary Certificate - awarded for training completed after high school (for example, in agriculture or natural resources, computer services, personal or culinary services, engineering technologies, healthcare, construction trades, mechanic and repair technologies, or precision production)"
+2.D.1.4,Some College Courses,2.D.1,Required Level of Education,If user's education level is : Some College Courses
+2.D.1.5,Associate's Degree (or other 2-year degree),2.D.1,Required Level of Education,If user's education level is : Associate's Degree (or other 2-year degree)
+2.D.1.6,Bachelor's Degree,2.D.1,Required Level of Education,If user's education level is : Bachelor's Degree
+2.D.1.7,Post-Baccalaureate Certificate - awarded for completion of an organized program of study; designed for people who have completed a Baccalaureate degree but do not meet the requirements of academic degrees carrying the title of Master.,2.D.1,Required Level of Education,If user's education level is : Post-Baccalaureate Certificate - awarded for completion of an organized program of study; designed for people who have completed a Baccalaureate degree but do not meet the requirements of academic degrees carrying the title of Master.
+2.D.1.8,Master's Degree,2.D.1,Required Level of Education,If user's education level is : Master's Degree
+2.D.1.9,Post-Master's Certificate - awarded for completion of an organized program of study; designed for people who have completed a Master's degree but do not meet the requirements of academic degrees at the doctoral level.,2.D.1,Required Level of Education,If user's education level is : Post-Master's Certificate - awarded for completion of an organized program of study; designed for people who have completed a Master's degree but do not meet the requirements of academic degrees at the doctoral level.
+2.D.1.10,"First Professional Degree - awarded for completion of a program that: requires at least 2 years of college work before entrance into the program, includes a total of at least 6 academic years of work to complete, and provides all remaining academic requirements to begin practice in a profession.",2.D.1,Required Level of Education,"If user's education level is : First Professional Degree - awarded for completion of a program that: requires at least 2 years of college work before entrance into the program, includes a total of at least 6 academic years of work to complete, and provides all remaining academic requirements to begin practice in a profession."
+2.D.1.11,Doctoral Degree,2.D.1,Required Level of Education,If user's education level is : Doctoral Degree
+2.D.1.12,Post-Doctoral Training,2.D.1,Required Level of Education,If user's education level is : Post-Doctoral Training
+2.N,"Custom added worker education, training and experience",,,
+2.N.1,Education Level in Specific Subjects,,,"Prior coursework in 15 subject areas to perform in a job. Subject areas cover most of the courses that occur in high school, junior college, college undergraduate degree programs, and other education and training programs"
+2.N.1.a,Technical Vocational,,,"Courses focus on non-business technical skills, such as Agriculture, Industrial Arts, Automobile and Shop, and Electronics"
+2.N.1.b,Business Vocational,,,"Courses focus on basic business skills, such as Word Processing, Filing, Bookkeeping/Basic Accounting"
+2.N.1.c,English/language Arts,,,"Courses focus on reading, interpretation, and writing, such as Literature, Composition, Journalism, and Creative Writing"
+2.N.1.d,Oral Communication,,,"Courses focus on oral communication and speech, such as Oral Communication, Speech, and Interpersonal Communication"
+2.N.1.e,Languages,,,"Courses focus on reading, writing, and/or speaking languages other than English, such as French, Chinese, German, Japanese, Latin, Russian, and Spanish"
+2.N.1.f,Basic Math,,,"Courses focus on basic and applied math, such as General Math and Business Math"
+2.N.1.g,Advanced Math,,,"Courses focus on advanced topics in math, such as Algebra, Geometry, Calculus, and Statistics"
+2.N.1.h,Physical Science,,,"Courses focus on the study of matter and/or energy, such as Physics, Chemistry, and Astronomy"
+2.N.1.i,Computer Science,,,"Courses focus on computers and their uses, such as Programming, Information Systems Management, and Software Applications"
+2.N.1.j,Biological Science,,,"Courses focus on the study of life and living beings, such as life science, biology, anatomy and physiology"
+2.N.1.k,Applied Science,,,"Courses focus on the application of science, such as Engineering, Health, and Medicine"
+2.N.1.l,Social Science,,,"Courses focus on the behavioral sciences, such as Social Studies, Economics, History, Psychology, and Sociology"
+2.N.1.m,Arts,,,"Courses focus on visual and performing arts, such as Arts and Crafts, Music, Painting, Sculpture, Theater, and Voice"
+2.N.1.n,Humanities,,,"Courses focus on cultural and philosophical aspects of humans, such as Minority Studies, Philosophy, and Religion"
+2.N.1.o,Physical Education,,,"Courses focus on physical fitness and sports, such as Aerobics, Jogging, Weight Lifting, and Specific Sports"
+3,Skills & Knowledge,,,
+3.A,Basic Skills,2.A,Basic Skills,Developed capacities that facilitate learning or the more rapid acquisition of knowledge
+3.A.1,Content,2.A.1,Content,Background structures needed to work with and acquire more specific skills in a variety of different domains
+3.A.1.a,Reading Comprehension,2.A.1.a,Reading Comprehension,Understanding written sentences and paragraphs in work-related documents.
+3.A.1.b,Active Listening,2.A.1.b,Active Listening,"Giving full attention to what other people are saying, taking time to understand the points being made, asking questions as appropriate, and not interrupting at inappropriate times."
+3.A.1.c,Writing,2.A.1.c,Writing,Communicating effectively in writing as appropriate for the needs of the audience.
+3.A.1.d,Speaking,2.A.1.d,Speaking,Talking to others to convey information effectively.
+3.A.1.e,Mathematics,2.A.1.e,Mathematics,Using mathematics to solve problems.
+3.A.1.f,Science,2.A.1.f,Science,Using scientific rules and methods to solve problems.
+3.A.2,Process,2.A.2,Process,Procedures that contribute to the more rapid acquisition of knowledge and skill across a variety of domains
+3.A.2.a,Critical Thinking,2.A.2.a,Critical Thinking,"Using logic and reasoning to identify the strengths and weaknesses of alternative solutions, conclusions, or approaches to problems."
+3.A.2.b,Active Learning,2.A.2.b,Active Learning,Understanding the implications of new information for both current and future problem-solving and decision-making.
+3.A.2.c,Learning Strategies,2.A.2.c,Learning Strategies,Selecting and using training/instructional methods and procedures appropriate for the situation when learning or teaching new things.
+3.A.2.d,Monitoring,2.A.2.d,Monitoring,"Monitoring/Assessing performance of yourself, other individuals, or organizations to make improvements or take corrective action."
+3.B,Cross-Functional Skills,2.B,Cross-Functional Skills,Developed capacities that facilitate performance of activities that occur across jobs
+3.B.1,Social Skills,2.B.1,Social Skills,Developed capacities used to work with people to achieve goals
+3.B.1.a,Social Perceptiveness,2.B.1.a,Social Perceptiveness,Being aware of others' reactions and understanding why they react as they do.
+3.B.1.b,Coordination,2.B.1.b,Coordination,Adjusting actions in relation to others' actions.
+3.B.1.c,Persuasion,2.B.1.c,Persuasion,Persuading others to change their minds or behavior.
+3.B.1.d,Negotiation,2.B.1.d,Negotiation,Bringing others together and trying to reconcile differences.
+3.B.1.e,Instructing,2.B.1.e,Instructing,Teaching others how to do something.
+3.B.1.f,Service Orientation,2.B.1.f,Service Orientation,Actively looking for ways to help people.
+3.B.2,Complex Problem Solving Skills,2.B.2,Complex Problem Solving Skills,"Developed capacities used to solve novel, ill-defined problems in complex, real-world settings"
+3.B.2.i,Complex Problem Solving,2.B.2.i,Complex Problem Solving,Identifying complex problems and reviewing related information to develop and evaluate options and implement solutions.
+3.B.3,Technical Skills,2.B.3,Technical Skills,"Developed capacities used to design, set-up, operate, and correct malfunctions involving application of machines or technological systems"
+3.B.3.a,Operations Analysis,2.B.3.a,Operations Analysis,Analyzing needs and product requirements to create a design.
+3.B.3.b,Technology Design,2.B.3.b,Technology Design,Generating or adapting equipment and technology to serve user needs.
+3.B.3.c,Equipment Selection,2.B.3.c,Equipment Selection,Determining the kind of tools and equipment needed to do a job.
+3.B.3.d,Installation,2.B.3.d,Installation,"Installing equipment, machines, wiring, or programs to meet specifications."
+3.B.3.e,Programming,2.B.3.e,Programming,Writing computer programs for various purposes.
+3.B.3.g,Operations Monitoring,2.B.3.g,Operations Monitoring,"Watching gauges, dials, or other indicators to make sure a machine is working properly."
+3.B.3.h,Operation and Control,2.B.3.h,Operation and Control,Controlling operations of equipment or systems.
+3.B.3.j,Equipment Maintenance,2.B.3.j,Equipment Maintenance,Performing routine maintenance on equipment and determining when and what kind of maintenance is needed.
+3.B.3.k,Troubleshooting,2.B.3.k,Troubleshooting,Determining causes of operating errors and deciding what to do about it.
+3.B.3.l,Repairing,2.B.3.l,Repairing,Repairing machines or systems using the needed tools.
+3.B.3.m,Quality Control Analysis,2.B.3.m,Quality Control Analysis,"Conducting tests and inspections of products, services, or processes to evaluate quality or performance."
+3.B.4,Systems Skills,2.B.4,Systems Skills,"Developed capacities used to understand, monitor, and improve socio-technical systems"
+3.B.4.e,Judgment and Decision Making,2.B.4.e,Judgment and Decision Making,Considering the relative costs and benefits of potential actions to choose the most appropriate one.
+3.B.4.g,Systems Analysis,2.B.4.g,Systems Analysis,"Determining how a system should work and how changes in conditions, operations, and the environment will affect outcomes."
+3.B.4.h,Systems Evaluation,2.B.4.h,Systems Evaluation,"Identifying measures or indicators of system performance and the actions needed to improve or correct performance, relative to the goals of the system."
+3.B.5,Resource Management Skills,2.B.5,Resource Management Skills,Developed capacities used to allocate resources efficiently
+3.B.5.a,Time Management,2.B.5.a,Time Management,Managing one's own time and the time of others.
+3.B.5.b,Management of Financial Resources,2.B.5.b,Management of Financial Resources,"Determining how money will be spent to get the work done, and accounting for these expenditures."
+3.B.5.c,Management of Material Resources,2.B.5.c,Management of Material Resources,"Obtaining and seeing to the appropriate use of equipment, facilities, and materials needed to do certain work."
+3.B.5.d,Management of Personnel Resources,2.B.5.d,Management of Personnel Resources,"Motivating, developing, and directing people as they work, identifying the best people for the job."
+3.C,Knowledge,2.C,Knowledge,Organized sets of principles and facts applying in general domains
+3.C.1,Business and Management,2.C.1,Business and Management,"Knowledge of principles and facts related to business administration and accounting, human and material resource management in organizations, sales and marketing, economics, and office information and organizing systems"
+3.C.1.a,Administration and Management,2.C.1.a,Administration and Management,"Knowledge of business and management principles involved in strategic planning, resource allocation, human resources modeling, leadership technique, production methods, and coordination of people and resources."
+3.C.1.b,Administrative,2.C.1.b,Administrative,"Knowledge of administrative and office procedures and systems such as word processing, managing files and records, stenography and transcription, designing forms, and workplace terminology."
+3.C.1.c,Economics and Accounting,2.C.1.c,Economics and Accounting,"Knowledge of economic and accounting principles and practices, the financial markets, banking, and the analysis and reporting of financial data."
+3.C.1.d,Sales and Marketing,2.C.1.d,Sales and Marketing,"Knowledge of principles and methods for showing, promoting, and selling products or services. This includes marketing strategy and tactics, product demonstration, sales techniques, and sales control systems."
+3.C.1.e,Customer and Personal Service,2.C.1.e,Customer and Personal Service,"Knowledge of principles and processes for providing customer and personal services. This includes customer needs assessment, meeting quality standards for services, and evaluation of customer satisfaction."
+3.C.1.f,Personnel and Human Resources,2.C.1.f,Personnel and Human Resources,"Knowledge of principles and procedures for personnel recruitment, selection, training, compensation and benefits, labor relations and negotiation, and personnel information systems."
+3.C.2,Manufacturing and Production,2.C.2,Manufacturing and Production,"Knowledge of principles and facts related to the production, processing, storage, and distribution of manufactured and agricultural goods"
+3.C.2.a,Production and Processing,2.C.2.a,Production and Processing,"Knowledge of raw materials, production processes, quality control, costs, and other techniques for maximizing the effective manufacture and distribution of goods."
+3.C.2.b,Food Production,2.C.2.b,Food Production,"Knowledge of techniques and equipment for planting, growing, and harvesting food products (both plant and animal) for consumption, including storage/handling techniques."
+3.C.3,Engineering and Technology,2.C.3,Engineering and Technology,"Knowledge of the design, development, and application of technology for specific purposes."
+3.C.3.a,Computers and Electronics,2.C.3.a,Computers and Electronics,"Knowledge of circuit boards, processors, chips, electronic equipment, and computer hardware and software, including applications and programming."
+3.C.3.b,Engineering and Technology,2.C.3.b,Engineering and Technology,"Knowledge of the practical application of engineering science and technology. This includes applying principles, techniques, procedures, and equipment to the design and production of various goods and services."
+3.C.3.c,Design,2.C.3.c,Design,"Knowledge of design techniques, tools, and principles involved in production of precision technical plans, blueprints, drawings, and models."
+3.C.3.d,Building and Construction,2.C.3.d,Building and Construction,"Knowledge of materials, methods, and the tools involved in the construction or repair of houses, buildings, or other structures such as highways and roads."
+3.C.3.e,Mechanical,2.C.3.e,Mechanical,"Knowledge of machines and tools, including their designs, uses, repair, and maintenance."
+3.C.4,Mathematics and Science,2.C.4,Mathematics and Science,"Knowledge of the history, theories, methods, and applications of the physical, biological, social, mathematical, and geography"
+3.C.4.a,Mathematics,2.C.4.a,Mathematics,"Knowledge of arithmetic, algebra, geometry, calculus, statistics, and their applications."
+3.C.4.b,Physics,2.C.4.b,Physics,"Knowledge and prediction of physical principles, laws, their interrelationships, and applications to understanding fluid, material, and atmospheric dynamics, and mechanical, electrical, atomic and sub-atomic structures and processes."
+3.C.4.c,Chemistry,2.C.4.c,Chemistry,"Knowledge of the chemical composition, structure, and properties of substances and of the chemical processes and transformations that they undergo. This includes uses of chemicals and their interactions, danger signs, production techniques, and disposal methods."
+3.C.4.d,Biology,2.C.4.d,Biology,"Knowledge of plant and animal organisms, their tissues, cells, functions, interdependencies, and interactions with each other and the environment."
+3.C.4.e,Psychology,2.C.4.e,Psychology,"Knowledge of human behavior and performance; individual differences in ability, personality, and interests; learning and motivation; psychological research methods; and the assessment and treatment of behavioral and affective disorders."
+3.C.4.f,Sociology and Anthropology,2.C.4.f,Sociology and Anthropology,"Knowledge of group behavior and dynamics, societal trends and influences, human migrations, ethnicity, cultures, and their history and origins."
+3.C.4.g,Geography,2.C.4.g,Geography,"Knowledge of principles and methods for describing the features of land, sea, and air masses, including their physical characteristics, locations, interrelationships, and distribution of plant, animal, and human life."
+3.C.5,Health Services,2.C.5,Health Services,"Knowledge of principles and facts regarding diagnosing, curing, and preventing disease, and improving and preserving physical and mental health and well-being"
+3.C.5.a,Medicine and Dentistry,2.C.5.a,Medicine and Dentistry,"Knowledge of the information and techniques needed to diagnose and treat human injuries, diseases, and deformities. This includes symptoms, treatment alternatives, drug properties and interactions, and preventive health-care measures."
+3.C.5.b,Therapy and Counseling,2.C.5.b,Therapy and Counseling,"Knowledge of principles, methods, and procedures for diagnosis, treatment, and rehabilitation of physical and mental dysfunctions, and for career counseling and guidance."
+3.C.6,Education and Training,2.C.6,Education and Training,"Knowledge of principles and methods for curriculum and training design, teaching and instruction for individuals and groups, and the measurement of training effects."
+3.C.7,Arts and Humanities,2.C.7,Arts and Humanities,"Knowledge of facts and principles related to the branches of learning concerned with human thought, language, and the arts."
+3.C.7.a,English Language,2.C.7.a,English Language,"Knowledge of the structure and content of the English language including the meaning and spelling of words, and rules of composition and grammar."
+3.C.7.b,Foreign Language,2.C.7.b,Foreign Language,"Knowledge of the structure and content of a foreign (non-English) language including the meaning and spelling of words, rules of composition and grammar, and pronunciation."
+3.C.7.c,Fine Arts,2.C.7.c,Fine Arts,"Knowledge of the theory and techniques required to compose, produce, and perform works of music, dance, visual arts, drama, and sculpture."
+3.C.7.d,History and Archeology,2.C.7.d,History and Archeology,"Knowledge of historical events and their causes, indicators, and effects on civilizations and cultures."
+3.C.7.e,Philosophy and Theology,2.C.7.e,Philosophy and Theology,"Knowledge of different philosophical systems and religions. This includes their basic principles, values, ethics, ways of thinking, customs, practices, and their impact on human culture."
+3.C.8,Law and Public Safety,2.C.8,Law and Public Safety,"Knowledge of regulations and methods for maintaining people and property free from danger, injury, or damage; the rules of public conduct established and enforced by legislation, and the political process establishing such rules."
+3.C.8.a,Public Safety and Security,2.C.8.a,Public Safety and Security,"Knowledge of relevant equipment, policies, procedures, and strategies to promote effective local, state, or national security operations for the protection of people, data, property, and institutions."
+3.C.8.b,Law and Government,2.C.8.b,Law and Government,"Knowledge of laws, legal codes, court procedures, precedents, government regulations, executive orders, agency rules, and the democratic political process."
+3.C.9,Communications,2.C.9,Communications,Knowledge of the science and art of delivering information
+3.C.9.a,Telecommunications,2.C.9.a,Telecommunications,"Knowledge of transmission, broadcasting, switching, control, and operation of telecommunications systems."
+3.C.9.b,Communications and Media,2.C.9.b,Communications and Media,"Knowledge of media production, communication, and dissemination techniques and methods. This includes alternative ways to inform and entertain via written, oral, and visual media."
+3.C.10,Transportation,2.C.10,Transportation,"Knowledge of principles and methods for moving people or goods by air, rai"
+4,Work Interests & Values,,,
+4.B,Interests and Work Values,1.B,,Preferences for work environments and outcomes
+4.B.1,General Occupational Interests,1.B.1,,"Preferences for work environments. Occupational Interest Profiles (OIPs) are compatible with Holland's (1997) model of personality types and work environments. Six interest categories are used to describe the work environment of occupations: Realistic, Investigative, Artistic, Social, Enterprising, and Conventional. An OIP consists of six numerical scores indicating how descriptive and characteristic each work environment (or interest area) is for an O*NET-SOC occupation. In addition, a high-point profile has been assigned indicating which interests are most characteristic of an O*NET-SOC occupation. A high-point profile consists of one to three interest codes, depending on how many interest categories meet a minimum degree of descriptiveness for the O*NET-SOC occupation."
+4.B.1.a,Realistic,1.B.1.a,,"Work involves designing, building, or repairing of equipment, materials, or structures, engaging in physical activity, or working outdoors. Realistic occupations are often associated with engineering, mechanics and electronics, construction, woodworking, transportation, machine operation, agriculture, animal services, physical or manual labor, athletics, or protective services."
+4.B.1.b,Investigative,1.B.1.b,,"Work involves studying and researching non-living objects, living organisms, disease or other forms of impairment, or human behavior. Investigative occupations are often associated with physical, life, medical, or social sciences, and can be found in the fields of humanities, mathematics/statistics, information technology, or health care service."
+4.B.1.c,Artistic,1.B.1.c,,"Work involves creating original visual artwork, performances, written works, food, or music for a variety of media, or applying artistic principles to the design of various objects and materials. Artistic occupations are often associated with visual arts, applied arts and design, performing arts, music, creative writing, media, or culinary art."
+4.B.1.d,Social,1.B.1.d,,"Work involves helping, teaching, advising, assisting, or providing service to others. Social occupations are often associated with social, health care, personal service, teaching/education, or religious activities."
+4.B.1.e,Enterprising,1.B.1.e,,"Work involves managing, negotiating, marketing, or selling, typically in a business setting, or leading or advising people in political and legal situations. Enterprising occupations are often associated with business initiatives, sales, marketing/advertising, finance, management/administration, professional advising, public speaking, politics, or law."
+4.B.1.f,Conventional,1.B.1.f,,"Work involves following procedures and regulations to organize information or data, typically in a business setting. Conventional occupations are often associated with office work, accounting, mathematics/statistics, information technology, finance, or human resources."
+4.B.2,Work Values,1.B.2,,"Occupational Reinforcer Patterns (ORPs) indicate which work values and needs are likely to be reinforced or satisfied by a particular O*NET-SOC occupation. The use of work values to describe occupations is based on the Theory of Work Adjustment (TWA) developed during the Work Adjustment Project at the University of Minnesota under Research Grants from the U.S. Department of Health, Education and Welfare (Dawis, R.V., England, G.W., & Lofquist, L.H., 1964; Dawis, R.V., & Lofquist, L.H., 1984). This theory proposes that job satisfaction is directly related to the degree to which a person's values and corresponding needs are satisfied by his or her work environment. The TWA identifies six work values each with a corresponding set of needs."
+4.B.2.a,Achievement,1.B.2.a,,"Occupations that satisfy this work value are results oriented and allow employees to use their strongest abilities, giving them a feeling of accomplishment. Corresponding needs are Ability Utilization and Achievement."
+4.B.2.b,Working Conditions,1.B.2.b,,"Occupations that satisfy this work value offer job security and good working conditions. Corresponding needs are Activity, Compensation, Independence, Security, Variety and Working Conditions."
+4.B.2.c,Recognition,1.B.2.c,,"Occupations that satisfy this work value offer advancement, potential for leadership, and are often considered prestigious. Corresponding needs are Advancement, Authority, Recognition and Social Status."
+4.B.2.d,Relationships,1.B.2.d,,"Occupations that satisfy this work value allow employees to provide service to others and work with co-workers in a friendly non-competitive environment. Corresponding needs are Co-workers, Moral Values and Social Service."
+4.B.2.e,Support,1.B.2.e,,"Occupations that satisfy this work value offer supportive management that stands behind employees. Corresponding needs are Company Policies, Supervision: Human Relations and Supervision: Technical."
+4.B.2.f,Independence,1.B.2.f,,"Occupations that satisfy this work value allow employees to work on their own and make decisions. Corresponding needs are Creativity, Responsibility and Autonomy."
+4.N,Custom added work interests and values,,,
+4.N.1,Custom added work values,,,
+4.N.1.a,Work-Life Balance,,,"Having strictboundaries between work and home; avoiding ""always-on"" cultures."
+4.N.1.b,Flexibility,,,Valuing control over when work happens (asynchronous work) or where (digital nomadism).
+4.N.1.c,Psychological Safety,,,"Prioritizing an environment where it is safe to fail, ask ""dumb"" questions, and be authentic."
+4.N.1.d,Learning & Growth,,,"Requiring a job that acts as an ""accelerator"" for your skills and knowledge."
+4.N.1.e,Intellectual Challenge,,,"The desire to solve ""hard"" problems that push your mental limits."
+4.N.1.f,Mastery,,,"The drive to become a world-class expert or ""craftsman"" in a specific technical skill."
+4.N.1.g,Diversity & Inclusion,,,"Requiring an environment that values different backgrounds, perspectives, and equitable treatment."
+4.N.1.h,Personal Fulfillment,,,"Requiring work that aligns with your identity and makes you feel ""whole."""
+4.N.1.i,Mission-driven,,,"Needing the company's product to serve a ""greater good"" (e.g., sustainability, health)."
+4.N.1.j,Innovation,,,"Wanting to be on the ""bleeding edge""—building things that have never existed before."
+4.N.1.k,Impact,,,"Needing to see the direct, tangible result of your work."
+4.N.2.a,Mechanics/Electronics,,,"Work involves maintaining and repairing of machinery, such as automotive engines, electronic equipment, computers, and communication systems."
+4.N.2.b,Construction/Woodwork,1.B.3.b,,"Work involves constructing, installing, or repairing structures and fixtures made of wood."
+4.N.2.c,Transportation/Machine Operation,1.B.3.c,,"Work involves driving vehicles, such as vans, trucks, trains, and buses to transport people or materials. Work can also involve operating heavy equipment, such as cranes, forklifts, bulldozers, and backhoes to move materials or earth."
+4.N.2.d,Physical/Manual Labor,1.B.3.d,,"Work involves manually unloading and moving freight, stock, luggage, or other materials, or performing other physical labor."
+4.N.2.e,Protective Service,1.B.3.e,,Work involves maintaining order and protecting life and property by conducting investigations and enforcing laws and regulations to prevent or solve crimes.
+4.N.2.f,Agriculture,1.B.3.f,,"Work involves planting, cultivating, and harvesting crops, plants, or trees, or raising farm animals. Work can also involve preparing plant and animal products for distribution to consumers, or protecting natural resources to maximize their use in farming."
+4.N.2.g,Nature/Outdoors,1.B.3.g,,"Work involves planning, restoring, and conserving natural areas and wildlife habitats."
+4.N.2.h,Animal Service,1.B.3.h,,"Work involves feeding, grooming, exercising, or otherwise providing care to promote and maintain the well-being of pets and other animals in settings such as kennels, animal shelters, and zoos."
+4.N.2.i,Athletics,1.B.3.i,,"Work involves training, practicing, or competing in athletic events, or supporting those participating in athletics through coaching, training, or officiating."
+4.N.2.j,Engineering,1.B.3.j,,"Work involves applying science and technology to the design, building, testing, and use of electrical and electronic components, mechanical devices and machines, automotive, marine, and aerospace equipment and vehicles, materials, or structures."
+4.N.2.k,Physical Science,1.B.3.k,,"Work involves studying and researching non-living objects, materials, and phenomena through scientific disciplines such as physics, chemistry, astronomy, meteorology, or geology."
+4.N.2.l,Life Science,1.B.3.l,,"Work involves studying and researching living organisms through scientific disciplines such as biology, botany, zoology, microbiology, physiology, biochemistry, or zoology."
+4.N.2.m,Medical Science,1.B.3.m,,"Work involves studying and researching the causes, nature, effects, and treatments of disease or other forms of impairment or illness."
+4.N.2.n,Social Science,1.B.3.n,,"Work involves studying and researching human behavior, society, politics, and social relationships through scientific disciplines such as psychology, sociology, economics, or political science."
+4.N.2.o,Humanities,1.B.3.o,,"Work involves studying and researching aspects of human history, culture, and language through disciplines such as history, philosophy, the language arts, or area/ethnic studies."
+4.N.2.p,Mathematics/Statistics,1.B.3.p,,Work involves developing and applying mathematics and statistical theory and methods.
+4.N.2.q,Information Technology,1.B.3.q,,"Work involves designing, developing, testing, and maintaining computer software, hardware, networks, and systems."
+4.N.2.r,Visual Arts,1.B.3.r,,Work involves creating original visual artwork for a variety of media and purposes using various techniques and software.
+4.N.2.s,Applied Arts and Design,1.B.3.s,,Work involves applying artistic principles to the design and creation of various objects and materials.
+4.N.2.t,Performing Arts,1.B.3.t,,"Work involves acting as a performer in dance, comedy, or dramatic productions, choreographing of dance performances, or producing of live or recorded entertainment."
+4.N.2.u,Music,1.B.3.u,,"Work involves conducting, composing, or playing music or singing."
+4.N.2.v,Creative Writing,1.B.3.v,,"Work involves developing creative written works, such as novels, scripts, song lyrics, poetry, stories, or advertisements."
+4.N.2.w,Media,1.B.3.w,,"Work involves producing, developing, writing, directing, or presenting information through print, radio, television, or digital media."
+4.N.2.x,Culinary Art,1.B.3.x,,"Work involves preparing, cooking, and presenting food in a distinctive style usually associated with a specific culture or region."
+4.N.2.y,Teaching/Education,1.B.3.y,,"Work involves teaching through lectures, discussions, and demonstrations in one or more subjects."
+4.N.2.z,Social Service,1.B.3.z,,Work involves providing social services and assistance to improve the well-being and social and psychological functioning of children and adults.
+4.N.2.aa,Health Care Service,1.B.3.aa,,"Work involves providing health care services to individuals to include the diagnosis, prevention, or treatment of diseases and other forms of illness or impairment."
+4.N.2.ab,Religious Activities,1.B.3.ab,,"Work involves conducting religious worship, leading a church or other religious group, and offering moral guidance associated with beliefs and practices of a religious faith."
+4.N.2.ac,Personal Service,1.B.3.ac,,"Work involves providing personal services to individuals in need of non-medical assistance such as helping arrange or plan for travel, meals, or events."
+4.N.2.ad,Professional Advising,1.B.3.ad,,"Work involves providing expert advice, coaching, and counseling on topics such as careers, educational opportunities, and educational and professional development."
+4.N.2.ae,Business Initiatives,1.B.3.ae,,Work involves creating strategic plans or taking actions to expand an organization's business or market share.
+4.N.2.af,Sales,1.B.3.af,,Work involves selling goods or services.
+4.N.2.ag,Marketing/Advertising,1.B.3.ag,,"Work involves promoting or creating a public image for products, services, or organizations to attract interest, engagement, or sales."
+4.N.2.ah,Finance,1.B.3.ah,,"Work involves directing and managing financial activities, such as planning and investments for an individual or organization to generate income."
+4.N.2.ai,Accounting,1.B.3.ai,,"Work involves examining, analyzing, and interpreting accounting records for financial statements, or maintaining, auditing, or evaluating records and accounts."
+4.N.2.aj,Human Resources,1.B.3.aj,,"Work involves recruiting, selecting, and training job applicants, maintaining employee personnel records, administering compensation and employee-benefit programs, and conducting employee performance reviews."
+4.N.2.ak,Office Work,1.B.3.ak,,"Work involves clerical and administrative tasks for an organization such as answering phones, bookkeeping, updating records, scheduling appointments or meetings, and editing of documents and files."
+4.N.2.al,Management/Administration,1.B.3.al,,"Work involves planning, directing, or coordinating the daily operations of an organization, and overseeing personnel, business, or administrative services."
+4.N.2.am,Public Speaking,1.B.3.am,,"Work involves speaking before an audience to educate, entertain, or influence the listeners."
+4.N.2.an,Politics,1.B.3.an,,Work involves engaging in political activities to influence government policy.
+4.N.2.ao,Law,1.B.3.ao,,Work involves studying and applying legal knowledge.

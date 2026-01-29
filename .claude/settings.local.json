@@ -17,7 +17,11 @@
       "Bash(git mv:*)",
       "Bash(py -m pytest:*)",
       "Bash(where:*)",
-      "Bash(wc -l \"c:\\\\Users\\\\yikun\\\\Documents\\\\GitHub\\\\careerHQ\\\\packages\\\\core\\\\data\\\\occupation_rating\"\"*.txt 2>/dev/null || find \"c:/Users/yikun/Documents/GitHub/careerHQ/packages/core/data/occupation_rating\" -name \"*.txt \" -exec wc -l {} ;)"
+      "Bash(wc -l \"c:\\\\Users\\\\yikun\\\\Documents\\\\GitHub\\\\careerHQ\\\\packages\\\\core\\\\data\\\\occupation_rating\"\"*.txt 2>/dev/null || find \"c:/Users/yikun/Documents/GitHub/careerHQ/packages/core/data/occupation_rating\" -name \"*.txt \" -exec wc -l {} ;)",
+      "Bash(dir:*)",
+      "Bash(/c/Python311/python.exe -m pytest:*)",
+      "Bash(/c/Users/yikun/AppData/Local/Programs/Python/Python*/python.exe)",
+      "Bash(python3 -m pytest:*)"
     ]
   }
 }
