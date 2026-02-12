@@ -1,28 +1,22 @@
-"<!-- Objective: MVP chat UI shell with resume upload and profile visualization containers. -->"
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>Chat Interface</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>CareerHQ</title>
 </head>
 <body>
     <div id="chat-container">
         <div id="chat-history"></div>
-        <div id="skills-editor" style="display:none; margin-top: 10px;">
-            <textarea id="skills-textarea" placeholder="Edit your skills here...">Python, JavaScript, Machine Learning</textarea>
-            <!-- TODO: populate with parsed skills from resume -->
-            <br>
-            <button id="save-skills">Save Skills</button>
-            <!-- TODO: save the edited skills -->
+        <div id="input-area">
+            <div id="upload-zone">
+                <p>Drop your resume here or <span class="browse-link">browse</span></p>
+                <p class="hint">.pdf, .doc, .docx</p>
+                <input type="file" id="file-input" accept=".pdf,.doc,.docx" hidden>
+            </div>
         </div>
-        <textarea id="user-input" placeholder="Type your message..."></textarea>
-        <button id="send-button">Send</button>
-        <input type="file" id="file-input" accept=".pdf,.doc,.docx">
-        <button id="upload-button">Upload Resume</button>
     </div>
-    <script src="app.js"></script>
+    <script src="/static/app.js"></script>
 </body>
 </html>
-

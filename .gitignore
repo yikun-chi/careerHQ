@@ -35,5 +35,14 @@ dist/
 build/
 *.egg-info/
 
-# Data 
+# Data
 analysis/data
+
+# Test caches
+.pytest_cache/
+
+# Windows artifacts
+nul
+
+# Claude Code (machine-specific config)
+.claude/

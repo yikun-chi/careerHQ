@@ -6,7 +6,7 @@ import base64
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional
 from urllib import error, request
 
 from packages.core.ports.llm_provider import LLMProvider
@@ -140,6 +140,62 @@ class OpenAIResponsesClient(LLMProvider):
                 "format": {
                     "type": "json_schema",
                     "name": "resume_parse_result",
+                    "strict": True,
+                    "schema": dict(schema),
+                }
+            },
+        }
+
+        response_payload = self._post_json("/responses", payload)
+        text_output = _extract_output_text(response_payload)
+
+        try:
+            parsed = json.loads(text_output)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Responses API returned non-JSON content: {exc}") from exc
+
+        if not isinstance(parsed, dict):
+            raise ValueError("Responses API output must be a JSON object")
+        return parsed
+
+    def map_bullets_to_attributes(
+        self,
+        *,
+        bullet_texts: List[str],
+        attribute_catalog_text: str,
+        schema: Mapping[str, Any],
+        instructions: str,
+    ) -> Dict[str, Any]:
+        """Text-only call: map numbered bullets to user attributes."""
+        numbered = "\n".join(
+            f"{i}: {text}" for i, text in enumerate(bullet_texts)
+        )
+
+        payload = {
+            "model": self.model,
+            "input": [
+                {
+                    "role": "system",
+                    "content": [{"type": "input_text", "text": instructions}],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": (
+                                "Map the following resume bullets to attributes.\n\n"
+                                f"## Attribute catalog\n{attribute_catalog_text}\n\n"
+                                f"## Bullets\n{numbered}"
+                            ),
+                        },
+                    ],
+                },
+            ],
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "name": "bullet_attribute_mapping",
                     "strict": True,
                     "schema": dict(schema),
                 }

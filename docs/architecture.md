@@ -1,81 +1,165 @@
-# Design Documentation 
+# Architecture
+
+This document describes the actual implemented architecture of CareerHQ.
 
 ## 1. Core Design Principles
+
 ### 1.1 Hexagonal Architecture (Ports & Adapters)
-* **The Core:** Contains the "rules of coaching," the "Turn Pipeline," and the "Profile Schema." It has zero dependencies on specific vendors (OpenAI, AWS, etc.).
-* **The Ports:** Interfaces (Protocols) that define how the Core expects to talk to the world (e.g., `LLMProvider`, `ProfileStore`).
-* **The Adapters:** Concrete implementations (e.g., `OpenAIAdapter`, `PostgresStore`). 
 
-### 1.2: Major Components 
+- **Core** (`packages/core/`): Domain models, use cases, and business logic. Zero dependencies on specific vendors or infrastructure.
+- **Ports** (`packages/core/ports/`): Python `Protocol` interfaces that define how the core communicates with external services (e.g., `LLMProvider`).
+- **Adapters** (`packages/infra/`): Concrete implementations of ports (e.g., `OpenAIResponsesClient`).
 
-The system is partitioned into four distinct top-level directories, each representing a specific layer of the application lifecycle.
+### 1.2 Major Components
 
-| Component | What it does |
-| :--- | :--- |
-| **`apps/`** | **The Engines:** The actual programs that run on the server to handle requests. |
-| **`packages/`** | **The Knowledge:** The internal rules, career coaching logic, and database tools. |
-| **`web/`** | **The Interface:** Everything the user sees in their browser (Chat & Charts). |
-| **`tests/`** | **The Safety Net:** Automated checks to make sure no data gets lost or corrupted. |
+| Component | Purpose |
+|:---|:---|
+| `apps/api/` | FastAPI gateway — serves the web UI and the single API endpoint |
+| `apps/worker/` | Worker module — wraps the profile-init use case (currently invoked synchronously from the API, no queue) |
+| `packages/core/` | Domain models, use cases, ports |
+| `packages/infra/` | Infrastructure adapters (LLM client, stub dirs for db/queue/storage/telemetry) |
+| `web/` | Vanilla HTML/CSS/JS frontend |
+| `tests/` | Unit and integration tests (`unittest`) |
 
-## 2. The Apps Layer (`apps/`)
-The `apps/` directory contains the two primary services that power the platform. While they share the same "Knowledge" from the `packages/` folder, they perform very different roles in the user experience.
+## 2. The Apps Layer
 
 ### 2.1 The API Service (`apps/api/`)
-This is the **Synchronous Gateway**. It is the only part of the backend that the `web/` interface talks to directly.
-* **Authentication & Security:** Verifies user tokens and protects your data.
-* **Chat Management:** Receives the user's message and coordinates with the AI to send a text response back immediately.
-* **Data Retrieval:** Fetches the current state of the User Profile (all those hundreds of columns) so the frontend can display them.
-* **Fast Response:** Optimized for low latency so the user feels they are having a "real-time" conversation.
 
-### 2.2 The Worker Service (`apps/worker/`)
-This is the **Asynchronous Processor**. It handles the "thinking" that takes too long for a live chat response.
-* **Profile Extraction:** It reviews the chat transcript in the background to find and update the hundreds of specific profile attributes (e.g., updating "Years of Experience" or "Skill Levels").
-* **Roadmap Generation:** When a user's goals change, this service does the heavy computation to build or update their career path.
-* **Long-Running Tasks:** Handles file uploads (like Resume PDFs) and performs deep analysis that might take several seconds or minutes.
-* **Reliability:** If an AI task fails, the worker can automatically retry it without the user ever seeing an error message in their chat window.
+The synchronous gateway. FastAPI application defined in `apps/api/main.py`.
 
+**Lifespan preloading** — at startup the `lifespan` context manager loads two expensive resources into `app_state`:
+- `occupations`: the full 1016-occupation dictionary from pickle (`load_occupations()`)
+- `resume_instructions`: the LLM prompt with the complete O*NET occupation list and alternate titles (`build_resume_parse_instructions()`)
 
-## 3. The Packages Layer (`packages/`)
+**Routes:**
+- `GET /` — serves `web/index.html` via `FileResponse`
+- `/static/*` — serves CSS/JS from `web/` via `StaticFiles`
+- `POST /api/upload` — the single API endpoint (see `api_contract.md`)
 
-The `packages/` directory contains the shared internal logic of the system. It is structured to separate business rules from technical implementation details.
+**Request flow for `/api/upload`:**
+1. Validate file extension (`.pdf`, `.doc`, `.docx`)
+2. Write upload to a temp file
+3. Run the synchronous pipeline in a thread executor:
+   - `parse_resume_file()` → calls LLM to extract structured resume data
+   - `init_profile_from_resume()` → seeds user attributes from the parsed resume (3 phases)
+4. Build response JSON (jobs, education, skills, attribute sections, stats)
+5. Clean up temp file
 
-### 3.1 Core: The Business Logic (`packages/core/`)
-The `core` module houses the domain logic and coaching rules. It is designed to be technology-agnostic, having no direct dependencies on databases or external APIs.
+### 2.2 The Worker Module (`apps/worker/`)
 
-* **domain/**: Contains the fundamental entities and data structures. This is where the explicit schema for the **User Profile** (and its hundreds of career attributes) is defined using Python dataclasses or Pydantic models. Each attribute can also include metadata such as `source`, `extracted_at`, and optional `confidence` for provenance.
-* **ports/**: Defines the interfaces (Protocols) that the system requires to operate. It establishes the "contract" for external services, such as `ProfileRepository` or `ChatProvider`, without specifying the implementation.
-* **use_cases/**: Implements specific application workflows. This includes the "Turn Pipeline" orchestration, which manages the sequence of loading context, generating responses, and scheduling profile updates.
-* **policies/**: Contains the logic for different coaching states. These modules determine how the system should pivot between "Information Gathering" (Intake) and "Actionable Feedback" (Coaching).
-* **prompts/**: A centralized management system for LLM templates. This allows for versioned, structured instructions that guide the AI's behavior and tone.
-* **schemas/**: Defines the data validation layers. These are primarily Pydantic models used to ensure that AI-generated content is correctly formatted before being passed to the domain or database layers.
+`apps/worker/tasks/init_profile.py` exposes `run_init_profile(user, parsed_resume)`. It creates an `OpenAIResponsesClient` and delegates to `init_profile_from_resume()`.
 
+Currently the API calls the use case directly (no task queue). The worker module exists as a future integration point for async processing.
 
+## 3. The Packages Layer
 
-### 3.2 Infra: The Implementation Layer (`packages/infra/`)
-The `infra` module contains the concrete implementations (Adapters) of the interfaces defined in the `core`.
+### 3.1 Core Domain (`packages/core/domain/`)
 
-* **llm/**: Provides the technical integration for AI providers. This includes the specific API handling and error-correction logic for vendors like OpenAI or Anthropic.
-* **db/**: Manages data persistence. It contains the SQLAlchemy models that map the `core` profile entities to physical PostgreSQL columns, as well as the migration files for schema versioning.
-* **queue/**: Handles asynchronous communication. This provides the Celery and Redis configuration required to pass tasks from the API to the background Worker.
-* **telemetry/**: Implements observability tools. This includes structured logging, error tracking, and performance metrics for monitoring system health and AI response quality.
+| File | Contents |
+|:---|:---|
+| `occupation_class.py` | `Occupation`, `Element`, `ElementScale`, `OrganizationRegistry` — O*NET data model |
+| `occupation_initialize.py` | Loads raw O*NET data files, builds element trees |
+| `occupation_initialize_*.py` | Per-category loaders (1a, 1b, 1d, 2abc, 2d3a) |
+| `occupation_populate.py` | `load_occupations()` → dict of 1016 `Occupation` objects from pickle; `load_occupations_list()` → lightweight (id, name, description) tuples |
+| `user_class.py` | `User`, `UserAttribute`, `UserAttributeTemplate`, `AttributeTemplateRegistry`, `Job` |
+| `user_initialize.py` | Loads `~307` attribute templates from `user_attribute.csv`; `get_attribute_template_registry()` |
+| `user_service.py` | `add_job_experience()`, `update_user_attributes_from_job()`, `update_attributes_from_bullet_mappings()` — the Phase 1 and Phase 2 update logic |
+| `resume.py` | `ParsedResume`, `ResumeJob`, `ResumeEducation`, `ResumeProject` — structured resume output |
+| `bullet_mapping.py` | `BulletContext`, `AttributeMapping`, `BulletAttributeMapping` — data structures for Phase 2 |
+| `profile.py` | (placeholder) |
 
+### 3.2 Core Use Cases (`packages/core/use_cases/`)
 
+| File | Contents |
+|:---|:---|
+| `process_resume.py` | `parse_resume_file()` — sends resume + O*NET occupation list to LLM, validates output against `RESUME_PARSE_SCHEMA` |
+| `init_profile_from_resume.py` | `init_profile_from_resume()` — orchestrates all 3 phases: occupation-based updates, bullet-to-attribute mapping, education binary attributes. Returns `ProfileInitResult` |
+
+### 3.3 Core Ports (`packages/core/ports/`)
+
+| File | Contents |
+|:---|:---|
+| `llm_provider.py` | `LLMProvider` Protocol with two methods: `parse_resume()` and `map_bullets_to_attributes()` |
+
+### 3.4 Infrastructure (`packages/infra/`)
+
+| Directory | Status |
+|:---|:---|
+| `llm/client.py` | **Implemented** — `OpenAIResponsesClient` (gpt-4.1, Responses API, strict JSON schema, base64 file encoding, stdlib `urllib`) |
+| `db/` | Stub — `models.py` placeholder |
+| `queue/` | Stub — `broker.py` placeholder |
+| `storage/` | Stub — `files.py` placeholder |
+| `telemetry/` | Stub — `logging.py` placeholder |
 
 ## 4. The Web Layer (`web/`)
 
-The `web/` directory contains the client-side application. It is a standalone environment responsible for the user interface, data visualization, and real-time interaction. It communicates with the backend exclusively through the **API Service**.
+Vanilla HTML/CSS/JS — no framework, no build step.
 
-### 4.1 Frontend Architecture
-The frontend is built using a modern component-based framework (e.g., React or Next.js) to manage the complex state of the chat and the career profile.
+| File | Purpose |
+|:---|:---|
+| `index.html` | Single page: chat container with upload zone |
+| `styles.css` | Chat bubbles, drag-and-drop zone, result cards, progress bars |
+| `app.js` | Drag-and-drop + click-to-browse upload, `fetch("/api/upload")`, renders result cards |
 
-* **Components/**: Modular UI elements such as the chat interface, profile sidebars, and navigation menus.
-* **Visualizations/**: A specialized module for data-driven graphics. It maps the hundreds of profile attributes from the database into visual formats like skill spider charts, career timelines, and progress bars.
-* **Services/**: The API client layer that handles HTTP requests to the `apps/api/` endpoints. It ensures that data types in the frontend match the schemas defined in the backend.
-* **State Management/**: Handles the local "Source of Truth" for the browser. It ensures that when the AI extracts a new skill in the background, the UI updates the corresponding visualization without a full page reload.
+**UI flow:**
+1. Greeting message on page load
+2. User drops or selects a resume file (`.pdf`, `.doc`, `.docx`)
+3. Spinner while the backend processes (30-60 seconds)
+4. Result cards rendered: Work Experience, Education, Skills from Resume, Profile Attributes (7 sections with top-5 bar charts)
 
+## 5. Data Layer
 
+### 5.1 O*NET Occupations
+- **Source:** O*NET database text files in `packages/core/data/`
+- **Initialized form:** `packages/core/data/initialized/occupations.pkl` (~22 MB pickle)
+- **Count:** 1016 occupations, each with up to 159 elements
+- **Alternate titles:** `Alternate Titles.txt` — used in resume parsing prompt for better occupation matching
 
-### 4.2 Integration Points
-* **Chat Stream:** Uses Server-Sent Events (SSE) or WebSockets to display the AI's response word-by-word, providing a low-latency experience.
-* **Profile Synchronization:** Periodically polls or listens for updates from the **Worker Service**. As the attributes are populated in the database, this layer reflects those changes in the user's career roadmap.
-* **Visualization Engine:** Uses libraries like D3.js or Recharts to render the high-density data. Because the backend uses explicit columns, the frontend can request specific data points needed for a single chart (e.g., `GET /profile?fields=technical_skills`).
+### 5.2 User Attribute Templates
+- **Source:** `packages/core/data/user_attribute.csv`
+- **Count:** ~307 leaf attribute templates
+- **Hierarchy:** Dotted notation (e.g., `1.A.1.a.1` = Oral Comprehension)
+- **Mapping:** Each template has an optional `mapping_element_id` connecting it to an O*NET element
+
+### 5.3 Element Scales
+- 159 unique elements across categories (Abilities, Interests, Work Values, Work Styles, Skills, Knowledge, Education/Training)
+- 10 scale types: DR, EX, IM, LV, OI, OJ, PT, RL, RW, WI
+- See `business_logic.md` for scale details
+
+## 6. Deployment
+
+### Dockerfile
+```dockerfile
+FROM python:3.13-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+CMD ["python", "-m", "uvicorn", "apps.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### docker-compose.yml
+Single `web` service — builds from Dockerfile, maps port 8000, reads `.env` for `OPENAI_API_KEY`.
+
+### requirements.txt
+```
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+```
+
+No other runtime dependencies. The LLM client uses stdlib `urllib`.
+
+## 7. Not Yet Implemented
+
+The following features are planned but have no working code:
+
+- **Chat streaming** — SSE/WebSocket conversational interface
+- **Profile retrieval** — `GET /api/profile` endpoint
+- **Database** — PostgreSQL persistence (infra/db is a stub)
+- **Task queue** — Celery/Redis async processing (infra/queue is a stub)
+- **File storage** — S3/local file storage (infra/storage is a stub)
+- **Telemetry** — Logging and monitoring (infra/telemetry is a stub)
+- **Authentication** — User tokens, session management
+- **Custom attributes** — N-prefixed attributes (personality, age) require user input, not job-derived

@@ -126,6 +126,7 @@ class ResumeEducation:
     degree: Optional[str] = None
     field_of_study: Optional[str] = None
     graduation_year: Optional[int] = None
+    education_level: Optional[int] = None
     bullet_points: List[str] = field(default_factory=list)
 
     @classmethod
@@ -137,11 +138,16 @@ class ResumeEducation:
         if institution is None:
             raise ValueError("institution is required")
 
+        education_level = _coerce_optional_int(data.get("education_level"), "education_level")
+        if education_level is not None and not (1 <= education_level <= 12):
+            raise ValueError("education_level must be between 1 and 12")
+
         return cls(
             institution=institution,
             degree=_coerce_optional_string(data.get("degree"), "degree"),
             field_of_study=_coerce_optional_string(data.get("field_of_study"), "field_of_study"),
             graduation_year=_coerce_optional_int(data.get("graduation_year"), "graduation_year"),
+            education_level=education_level,
             bullet_points=_as_string_list(data.get("bullet_points"), "education bullet_points"),
         )
 
@@ -202,6 +208,7 @@ class ParsedResume:
                     "degree": edu.degree,
                     "field_of_study": edu.field_of_study,
                     "graduation_year": edu.graduation_year,
+                    "education_level": edu.education_level,
                     "bullet_points": edu.bullet_points,
                 }
                 for edu in self.education

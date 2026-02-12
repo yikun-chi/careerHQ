@@ -5,8 +5,9 @@ including adding job experiences and updating user attributes.
 """
 
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
+from .bullet_mapping import BulletAttributeMapping, BulletContext
 from .user_class import Job, User, UserAttribute, UserAttributeTemplate
 from .user_initialize import get_attribute_template_registry
 from .occupation_class import Element, Occupation
@@ -141,6 +142,11 @@ def update_attributes_with_element_mapping(
     years = _get_job_years(job)
 
     for attr_id, template in templates.items():
+        # Education leaf attributes (2.D.1.1–2.D.1.12) are set via the
+        # education-binary phase, not from job experience.
+        if attr_id.startswith("2.D.1."):
+            continue
+
         element_id = template.mapping_element_id
         if element_id is None:
             continue
@@ -292,3 +298,62 @@ def update_attributes_without_element_mapping(
     #   - 2.N.x (Custom education) - may need separate input
     #   - 4.N.x (Custom work values) - may need user preference input
     pass
+
+
+def update_attributes_from_bullet_mappings(
+    user: User,
+    mappings: List[BulletAttributeMapping],
+    bullets: List[BulletContext],
+    templates: Dict[str, UserAttributeTemplate],
+) -> None:
+    """Update user attributes based on LLM bullet-to-attribute mappings.
+
+    Uses the same formula as occupation-based updates:
+    - capability += years * relevance_score (capped at 100)
+    - preference += years * 2 (capped at 100)
+
+    Invalid attribute_ids are skipped. Relevance scores are clamped to [0, 1].
+
+    Parameters
+    ----------
+    user : User
+        The user whose attributes to update.
+    mappings : List[BulletAttributeMapping]
+        LLM-generated mappings from bullets to attributes.
+    bullets : List[BulletContext]
+        The bullet contexts (needed for years values).
+    templates : Dict[str, UserAttributeTemplate]
+        Leaf attribute templates for instantiating new attributes.
+    """
+    bullet_lookup = {b.bullet_index: b for b in bullets}
+
+    for mapping in mappings:
+        bullet = bullet_lookup.get(mapping.bullet_index)
+        if bullet is None:
+            continue
+
+        years = bullet.years
+
+        for attr_map in mapping.attributes:
+            # Skip invalid attribute_ids
+            if attr_map.attribute_id not in templates:
+                continue
+
+            # Clamp relevance_score to [0, 1]
+            relevance = max(0.0, min(1.0, attr_map.relevance_score))
+
+            # Get existing attribute or create from template
+            attr = user.get_attribute(attr_map.attribute_id)
+            if attr is None:
+                attr = templates[attr_map.attribute_id].instantiate()
+                user.add_attribute(attr)
+
+            # Update capability (cumulative, capped at 100)
+            capability_delta = years * relevance
+            current_capability = attr.capability or 0.0
+            attr.capability = min(100.0, current_capability + capability_delta)
+
+            # Update preference (cumulative, capped at 100)
+            preference_delta = years * 2
+            current_preference = attr.preference or 0.0
+            attr.preference = min(100.0, current_preference + preference_delta)

@@ -39,6 +39,35 @@ Requires `OPENAI_API_KEY` in environment or `.env` at project root.
 
 ---
 
+### `tests/test_init_profile.py`
+
+Unit tests for the profile initialization pipeline. Uses unittest with a `FakeLLMProvider` — no network calls.
+
+| Class | What it covers |
+|-------|---------------|
+| `TestCollectBullets` | Job-level bullets use `job.years_of_experience`; project-level bullets use fixed 1.0 year; correct `bullet_index` sequencing. |
+| `TestBuildCatalogText` | Catalog output is sorted by attribute ID; contains expected attribute names. |
+| `TestParseMappingResponse` | Valid LLM JSON → `BulletAttributeMapping` objects; malformed entries (non-dict, non-int index, int attribute ID) are skipped. |
+| `TestUpdateAttributesFromBulletMappings` | Basic capability/preference update; invalid attribute IDs skipped; relevance clamped to [0,1]; values capped at 100. |
+| `TestInitProfileFromResume` | Occupation-only (no bullets); combined occupation + bullet updates accumulate; unknown occupation IDs tracked in `skipped_occupations`; project bullets use 1.0 year. |
+| `TestEducationBinaryAttributes` | Bachelor's sets cumulative binary flags (1–6 True, 7–12 False); highest level wins across multiple entries; no education → no binary attributes. |
+
+---
+
+### `tests/test_career_analysis.py`
+
+Unit tests for the career analysis matching logic. Uses unittest with mock `User` and `Occupation` objects — no network calls, no pickle loading.
+
+| Class | What it covers |
+|-------|---------------|
+| `TestGetUserTop3` | Returns top 3 attributes by capability; skips zero-capability; filters by prefix (only matching category). |
+| `TestGetOccTop3` | Returns top 3 occupation elements ranked by scale value. |
+| `TestGetOccTop3Interests` | Combines OI (interests) and EX (work values) scales into a single ranked list. |
+| `TestFindMatchingOccupations` | Perfect match (3/3 overlap); partial match (2/3 overlap meets threshold); insufficient overlap (1/3 → no match); category skipped when user has < 2 scored attributes; multiple categories (abilities + work styles); results sorted descending by match count; capped at 15 results; empty user → no matches; cross-prefix matching (user `3.A` → O\*NET `2.A`). |
+| `TestCareerMatchDataclass` | `CareerMatch` fields are correctly set and accessible. |
+
+---
+
 ### `tests/test_occupation_initialize.py`
 
 Tests for the O\*NET occupation data loading pipeline. Uses pytest.

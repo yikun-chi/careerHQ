@@ -1,123 +1,180 @@
-# API Contract (MVP)
+# API Contract
 
-Objective: Define minimal HTTP contracts for chat, resume upload, and profile visualization without implementation details.
+This document describes the HTTP endpoints that are actually implemented.
 
 ## Base
-- Base path: /api
-- Content type: application/json (unless uploading files)
-- Auth: bearer token in `Authorization: Bearer <token>` (placeholder)
 
-## 1) Chat
-### POST /api/chat/stream
-Streams an assistant response for a single user message.
+- **Base path:** `/api`
+- **Auth:** None (not yet implemented)
+- **Server:** FastAPI + Uvicorn on port 8000
 
-Request (JSON):
-```
+## Endpoints
+
+### `GET /`
+
+Serves the static frontend (`web/index.html`).
+
+### `GET /static/*`
+
+Serves static assets (CSS, JS) from the `web/` directory.
+
+### `POST /api/upload`
+
+Accepts a resume file, runs the full parse-and-profile pipeline synchronously, and returns the complete result.
+
+**Request:** `multipart/form-data`
+
+| Field | Type | Required | Description |
+|:---|:---|:---|:---|
+| `file` | file | yes | Resume file (`.pdf`, `.doc`, or `.docx`) |
+
+**Success Response:** `200 OK`
+
+```json
 {
-  "user_id": "string",
-  "message": "string",
-  "conversation_id": "string",
-  "client_context": {
-    "timezone": "string",
-    "locale": "string"
-  }
-}
-```
-
-Response:
-- `text/event-stream` or WebSocket stream (implementation TBD)
-- Events: `message_delta`, `message_done`, `error`
-
-Example SSE payload (conceptual):
-```
-event: message_delta
-data: {"text": "Hello"}
-
-event: message_done
-data: {"message_id": "string"}
-```
-
-## 2) Resume Upload
-### POST /api/uploads/resume
-Uploads a resume and starts parsing / profile initialization.
-
-Request (multipart/form-data):
-- `file`: resume PDF/DOCX
-- `user_id`: string
-
-Response (JSON):
-```
-{
-  "upload_id": "string",
-  "status": "queued"
-}
-```
-
-## 3) Profile Retrieval
-### GET /api/profile
-Fetches the full profile and visualization-ready data.
-
-Query params:
-- `user_id` (required)
-- `fields` (optional, comma-separated)
-
-Response (JSON):
-```
-{
-  "user_id": "string",
-  "attributes": {
-    "technical_skills": {
-      "value": ["Python", "SQL"],
-      "source": "resume",
-      "extracted_at": "2026-01-22T15:04:12Z",
-      "confidence": 0.82
+  "jobs": [
+    {
+      "job_title": "Analytics Associate",
+      "company": "Acme Corp",
+      "occupation": "Management Analysts",
+      "years": 3.0
     }
-  },
-  "visualization": {
-    "skill_radar": {"series": [/* ... */]}
+  ],
+  "education": [
+    {
+      "institution": "State University",
+      "degree": "Bachelor of Science",
+      "field": "Computer Science",
+      "year": 2020
+    }
+  ],
+  "resume_skills": ["Python", "SQL", "Tableau"],
+  "attribute_sections": [
+    {
+      "label": "Abilities",
+      "prefix": "1.A",
+      "attributes": [
+        {
+          "attribute_id": "1.A.1.a.1",
+          "name": "Oral Comprehension",
+          "capability": 12.3,
+          "preference": 10.0
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "jobs_added": 2,
+    "bullets_mapped": 15,
+    "attributes_updated": 142
   }
 }
 ```
 
-## 4) Profile Update Status (optional)
-### GET /api/profile/status
-Returns background processing state.
+**Response fields:**
 
-Query params:
-- `user_id` (required)
+| Field | Description |
+|:---|:---|
+| `jobs[]` | Parsed job entries with matched O*NET occupation title and years |
+| `education[]` | Parsed education entries |
+| `resume_skills[]` | Flat list of skills extracted from the resume |
+| `attribute_sections[]` | 7 sections, each with up to 5 top attributes sorted by capability |
+| `stats` | Summary counts from the profile initialization pipeline |
 
-Response (JSON):
+**Attribute sections** (7 total):
+
+| Label | Prefix | Category |
+|:---|:---|:---|
+| Abilities | `1.A` | Cognitive and physical abilities |
+| Work Styles | `1.D` | Behavioral traits (e.g., attention to detail) |
+| Education | `2.D` | Education level requirements |
+| Basic Skills | `3.A` | Foundational skills (reading, writing, math) |
+| Cross-Functional Skills | `3.B` | Complex skills (critical thinking, problem solving) |
+| Knowledge | `3.C` | Domain knowledge areas |
+| Interests & Work Values | `4.B` | Holland interest codes and work values |
+
+**Error Responses:**
+
+| Status | Condition | Body |
+|:---|:---|:---|
+| `400` | Unsupported file extension | `{"detail": "Unsupported file type '.txt'. Allowed: .pdf, .doc, .docx"}` |
+| `500` | Pipeline failure (LLM error, parse error, etc.) | `{"detail": "<error message>"}` |
+
+## LLM Integration
+
+### Port
+
+`LLMProvider` protocol in `packages/core/ports/llm_provider.py` defines two methods:
+- `parse_resume()` — file-based structured extraction
+- `map_bullets_to_attributes()` — text-based bullet-to-attribute mapping
+
+### Adapter
+
+`OpenAIResponsesClient` in `packages/infra/llm/client.py`:
+- **Model:** `gpt-4.1` (configurable via `OPENAI_RESUME_PARSER_MODEL` env var)
+- **API:** OpenAI Responses API (`POST /v1/responses`)
+- **Schema enforcement:** `strict: true` JSON schema mode
+- **File handling:** Base64-encoded file content with MIME type
+- **HTTP client:** stdlib `urllib` (no `requests` or `httpx` dependency)
+- **Timeout:** 120 seconds
+
+Two LLM calls are made per upload:
+1. **Resume parse** — file + system prompt with 1016 O*NET occupations and alternate titles → structured JSON (jobs, skills, education)
+2. **Bullet mapping** — numbered bullet texts + attribute catalog → attribute mappings with relevance scores
+
+## Environment Variables
+
+| Variable | Required | Default | Description |
+|:---|:---|:---|:---|
+| `OPENAI_API_KEY` | yes | — | OpenAI API key (read from env or `.env` at project root) |
+| `OPENAI_RESUME_PARSER_MODEL` | no | `gpt-4.1` | Override the LLM model |
+
+## End-to-End Flow
+
 ```
-{
-  "user_id": "string",
-  "profile_status": "initializing | ready | error",
-  "last_updated": "2026-01-22T15:04:12Z"
-}
+Browser                  API Service              LLM (OpenAI)
+  │                          │                        │
+  │  POST /api/upload        │                        │
+  │  (multipart file)        │                        │
+  │─────────────────────────>│                        │
+  │                          │  parse_resume()        │
+  │                          │  (file + occupation    │
+  │                          │   list + schema)       │
+  │                          │───────────────────────>│
+  │                          │  structured JSON       │
+  │                          │<───────────────────────│
+  │                          │                        │
+  │                          │  Phase 1: add_job_     │
+  │                          │  experience() ×N jobs  │
+  │                          │  (local, no LLM)       │
+  │                          │                        │
+  │                          │  map_bullets_to_       │
+  │                          │  attributes()          │
+  │                          │  (bullets + catalog    │
+  │                          │   + schema)            │
+  │                          │───────────────────────>│
+  │                          │  mapping JSON          │
+  │                          │<───────────────────────│
+  │                          │                        │
+  │                          │  Phase 2: update       │
+  │                          │  attrs from bullets    │
+  │                          │  (local, no LLM)       │
+  │                          │                        │
+  │                          │  Phase 3: education    │
+  │                          │  binary attrs          │
+  │                          │  (local, no LLM)       │
+  │                          │                        │
+  │  200 JSON response       │                        │
+  │  (jobs, education,       │                        │
+  │   skills, attributes,    │                        │
+  │   stats)                 │                        │
+  │<─────────────────────────│                        │
 ```
-## Sample End-to-End Flow
-1) User opens the app
-- Frontend shows chat UI + �Upload resume� prompt.
-- No backend call yet.
 
-2) User uploads resume
-- Frontend sends `POST /api/uploads/resume` with `file` and `user_id`.
-- Backend responds: `{ "upload_id": "upl_123", "status": "queued" }`.
-- UI shows �Parsing your resume�� spinner.
+## Planned Endpoints (Not Yet Implemented)
 
-3) Background parsing kicks off
-- Worker reads the file, extracts fields, and initializes profile attributes.
-- UI can optionally poll `GET /api/profile/status?user_id=...` until `profile_status: ready`.
+These endpoints appear in earlier design docs but have no working code:
 
-4) User starts chatting
-- Frontend sends `POST /api/chat/stream` with message + `conversation_id`.
-- API streams deltas so the assistant �types� the response in real time.
-
-5) Profile view loads
-- Once status is `ready` (or on a timer), frontend calls `GET /api/profile?user_id=...`.
-- Response includes `attributes` plus a `visualization` object.
-- UI renders charts from `visualization` while also showing raw attributes if needed.
-
-6) Continued usage
-- As the user chats, new info gets extracted by the worker.
-- UI refreshes periodically to reflect updated attributes and charts.
-
+- `POST /api/chat/stream` — Conversational chat with SSE streaming
+- `GET /api/profile` — Full profile retrieval with field filtering
+- `GET /api/profile/status` — Background processing status polling

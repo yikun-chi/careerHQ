@@ -1,78 +1,199 @@
-// Objective: browser-side logic for chat, upload, and rendering profile data.
-let currentStep = 'ask_roadmap';
+const chat = document.getElementById("chat-history");
+const zone = document.getElementById("upload-zone");
+const fileInput = document.getElementById("file-input");
 
-function appendMessage(text, type) {
-    const chatHistory = document.getElementById('chat-history');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'message ' + type;
-    if (type === 'user') {
-        const photo = document.createElement('div');
-        photo.className = 'photo';
-        photo.textContent = 'U'; // Placeholder for user photo
-        messageDiv.appendChild(photo);
-    }
-    const textSpan = document.createElement('span');
-    textSpan.textContent = text;
-    messageDiv.appendChild(textSpan);
-    chatHistory.appendChild(messageDiv);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
+function addMsg(html, cls) {
+    const d = document.createElement("div");
+    d.className = "msg " + cls;
+    d.innerHTML = html;
+    chat.appendChild(d);
+    chat.scrollTop = chat.scrollHeight;
+    return d;
 }
 
-window.addEventListener('DOMContentLoaded', function() {
-    appendMessage('Welcome to CareerHQ! You can find your personalized career development advice here by analyzing your Skills, Interests, and Values. Do you want me to help you create a career development roadmap?', 'bot');
+function addCard(html) {
+    const d = document.createElement("div");
+    d.className = "result-card";
+    d.innerHTML = html;
+    chat.appendChild(d);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+// Greeting
+window.addEventListener("DOMContentLoaded", () => {
+    addMsg("Welcome to CareerHQ! Upload your resume to discover your top skills, abilities, and work values.", "bot");
 });
 
-document.getElementById('send-button').addEventListener('click', function() {
-    const userInput = document.getElementById('user-input');
-    const text = userInput.value.trim().toLowerCase();
-    if (text) {
-        appendMessage(userInput.value.trim(), 'user');
-        userInput.value = '';
-        if (currentStep === 'ask_roadmap') {
-            if (text === 'yes') {
-                appendMessage('Is your resume up to date?', 'bot');
-                currentStep = 'ask_resume_up_to_date';
-            } else if (text === 'no') {
-                appendMessage('Thank you. Please let me know when you want one.', 'bot');
-                currentStep = 'done';
-            } else {
-                appendMessage('Please answer with "yes" or "no". Would you like to have a career development roadmap?', 'bot');
-            }
-        } else if (currentStep === 'ask_resume_up_to_date') {
-            if (text === 'yes') {
-                appendMessage('Great! Since your resume is up to date, we can proceed with your current skills.', 'bot');
-                // TODO: Call backend API to get information from existing resume
-                appendMessage('Part I: Skill Set.', 'bot');
-                appendMessage('Here are your skills. Please edit if necessary.', 'bot');
-                document.getElementById('skills-editor').style.display = 'block';
-                currentStep = 'skills';
-            } else if (text === 'no') {
-                appendMessage('Please upload your resume.', 'bot');
-                currentStep = 'wait_upload';
-            } else {
-                appendMessage('Please answer with "yes" or "no". Is your resume up to date?', 'bot');
-            }
+// Drag-and-drop
+zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("dragover"); });
+zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
+zone.addEventListener("drop", e => {
+    e.preventDefault();
+    zone.classList.remove("dragover");
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+
+// Click to browse
+zone.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", () => {
+    if (fileInput.files.length) handleFile(fileInput.files[0]);
+});
+
+async function handleFile(file) {
+    addMsg("Uploaded: " + file.name, "user");
+
+    const spinnerMsg = addMsg('<span class="spinner"></span> Analyzing <b>' + escHtml(file.name) + '</b>... This takes 30-60 seconds.', "bot");
+
+    // Disable upload zone
+    zone.style.pointerEvents = "none";
+    zone.style.opacity = "0.5";
+
+    const form = new FormData();
+    form.append("file", file);
+
+    try {
+        const res = await fetch("/api/upload", { method: "POST", body: form });
+        spinnerMsg.remove();
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ detail: res.statusText }));
+            addMsg("Error: " + (err.detail || "Upload failed"), "bot error-msg");
+            zone.style.pointerEvents = "";
+            zone.style.opacity = "";
+            return;
         }
-    }
-});
 
-document.getElementById('upload-button').addEventListener('click', function() {
-    const fileInput = document.getElementById('file-input');
-    const file = fileInput.files[0];
-    if (file) {
-        appendMessage('Uploaded: ' + file.name, 'bot');
-        // TODO: Store the file and send to backend API for processing
-        appendMessage('Thank you for updating your resume. Please follow the following steps to continue. ', 'bot');
-        // TODO: Call backend API to parse resume and get skills
-        appendMessage('Part I: Skill Set.', 'bot');
-        appendMessage('After parsing your resume, here are your skills. Please edit it if necessary.', 'bot');
-        document.getElementById('skills-editor').style.display = 'block';
-        currentStep = 'skills';
+        const data = await res.json();
+        renderResults(data);
+    } catch (e) {
+        spinnerMsg.remove();
+        addMsg("Network error: " + e.message, "bot error-msg");
+        zone.style.pointerEvents = "";
+        zone.style.opacity = "";
     }
-});
+}
 
-document.getElementById('save-skills').addEventListener('click', function() {
-    const skills = document.getElementById('skills-textarea').value;
-    appendMessage('Skills updated: ' + skills, 'bot');
-    document.getElementById('skills-editor').style.display = 'none';
-});
+function renderResults(data) {
+    // Jobs
+    if (data.jobs && data.jobs.length) {
+        let html = "<h3>Work Experience</h3>";
+        for (const j of data.jobs) {
+            html += '<div class="job-entry">';
+            html += '<div class="title">' + escHtml(j.job_title) + "</div>";
+            html += '<div class="meta">' + escHtml(j.company) + " &middot; " + escHtml(j.occupation) + " &middot; " + j.years + " yr</div>";
+            html += "</div>";
+        }
+        addCard(html);
+    }
+
+    // Education
+    if (data.education && data.education.length) {
+        let html = "<h3>Education</h3>";
+        for (const e of data.education) {
+            html += '<div class="edu-entry">';
+            html += '<div class="title">' + escHtml(e.institution) + "</div>";
+            const parts = [e.degree, e.field, e.year].filter(Boolean);
+            if (parts.length) html += '<div class="meta">' + escHtml(parts.join(" - ")) + "</div>";
+            html += "</div>";
+        }
+        addCard(html);
+    }
+
+    // Skills
+    if (data.resume_skills && data.resume_skills.length) {
+        let html = "<h3>Skills from Resume</h3><div class='skills-list'>";
+        for (const s of data.resume_skills) html += '<span class="skill-pill">' + escHtml(s) + "</span>";
+        html += "</div>";
+        addCard(html);
+    }
+
+    // Attribute sections
+    if (data.attribute_sections) {
+        let html = "<h3>Profile Attributes</h3>";
+        for (const section of data.attribute_sections) {
+            if (!section.attributes.length) continue;
+            html += '<div class="attr-section">';
+            html += '<div class="section-title">' + escHtml(section.label) + "</div>";
+            for (const a of section.attributes) {
+                const pct = Math.min(100, a.capability);
+                html += '<div class="attr-bar">';
+                html += '<span class="name" title="' + escAttr(a.description || a.attribute_id) + '">' + escHtml(a.name) + "</span>";
+                html += '<div class="bar-bg"><div class="bar-fill" style="width:' + pct + '%"></div></div>';
+                html += '<span class="value">' + a.capability + "</span>";
+                html += "</div>";
+            }
+            html += "</div>";
+        }
+        addCard(html);
+    }
+
+    addMsg(
+        'Profile complete! Ready to find careers that match your strengths?<br><br>' +
+        '<button class="action-btn" id="run-career-btn">Run Career Analysis</button>',
+        "bot"
+    );
+    document.getElementById("run-career-btn").addEventListener("click", handleCareerAnalysis);
+
+    // Re-enable upload
+    const zone2 = document.getElementById("upload-zone");
+    zone2.style.pointerEvents = "";
+    zone2.style.opacity = "";
+}
+
+async function handleCareerAnalysis() {
+    const btn = document.getElementById("run-career-btn");
+    if (btn) btn.disabled = true;
+
+    const spinnerMsg = addMsg('<span class="spinner"></span> Finding matching careers...', "bot");
+
+    try {
+        const res = await fetch("/api/career-analysis");
+        spinnerMsg.remove();
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ detail: res.statusText }));
+            addMsg("Error: " + (err.detail || "Career analysis failed"), "bot error-msg");
+            return;
+        }
+
+        const data = await res.json();
+        renderCareerResults(data);
+    } catch (e) {
+        spinnerMsg.remove();
+        addMsg("Network error: " + e.message, "bot error-msg");
+    }
+}
+
+function renderCareerResults(data) {
+    if (!data.matches || !data.matches.length) {
+        addMsg("No matching occupations found. Try uploading a more detailed resume.", "bot");
+        return;
+    }
+
+    let html = "<h3>Career Matches</h3>";
+
+    for (const m of data.matches) {
+        html += '<div class="career-match">';
+        html += '<div class="match-header">';
+        html += '<span class="match-name">' + escHtml(m.occupation_name) + '</span>';
+        html += '<span class="match-badge">' + m.match_count + '/' + m.total_categories + '</span>';
+        html += '</div>';
+        html += '<div class="match-categories">';
+        for (const cat of m.matched_categories) {
+            html += '<span class="category-pill">' + escHtml(cat) + '</span>';
+        }
+        html += '</div>';
+        html += '</div>';
+    }
+
+    addCard(html);
+}
+
+function escHtml(s) {
+    if (s == null) return "";
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function escAttr(s) {
+    return escHtml(s);
+}

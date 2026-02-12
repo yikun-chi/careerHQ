@@ -4,11 +4,12 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from typing import Any, Dict, Mapping
+from typing import Any, Dict, List, Mapping
 
 # Add project root for imports.
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from packages.core.domain.resume import ResumeEducation, ParsedResume
 from packages.core.use_cases.process_resume import parse_resume_file
 
 
@@ -32,6 +33,16 @@ class FakeResumeLLMProvider:
         self.last_schema = schema
         self.last_instructions = instructions
         return dict(self.payload)
+
+    def map_bullets_to_attributes(
+        self,
+        *,
+        bullet_texts: List[str],
+        attribute_catalog_text: str,
+        schema: Mapping[str, Any],
+        instructions: str,
+    ) -> Dict[str, Any]:
+        return {"mappings": []}
 
 
 class TestParseResumeFile(unittest.TestCase):
@@ -62,6 +73,7 @@ class TestParseResumeFile(unittest.TestCase):
                     "degree": "B.S.",
                     "field_of_study": "Computer Science",
                     "graduation_year": 2022,
+                    "education_level": 6,
                     "bullet_points": ["Dean's List"],
                 }
             ],
@@ -80,6 +92,7 @@ class TestParseResumeFile(unittest.TestCase):
         self.assertEqual(parsed.jobs[0].projects[0].project_name, "Realtime Analytics")
         self.assertEqual(parsed.skills, ["Python", "SQL", "FastAPI"])
         self.assertEqual(parsed.education[0].institution, "State University")
+        self.assertEqual(parsed.education[0].education_level, 6)
         self.assertIsNotNone(provider.last_resume_path)
         self.assertIsNotNone(provider.last_schema)
         self.assertIsNotNone(provider.last_instructions)
@@ -88,6 +101,53 @@ class TestParseResumeFile(unittest.TestCase):
         provider = FakeResumeLLMProvider({"jobs": [], "skills": [], "education": []})
         with self.assertRaises(FileNotFoundError):
             parse_resume_file("does_not_exist.pdf", llm_provider=provider)
+
+
+class TestEducationLevelRoundTrip(unittest.TestCase):
+    """Verify education_level survives from_dict -> to_dict."""
+
+    def test_education_level_round_trips(self) -> None:
+        data = {
+            "jobs": [],
+            "skills": [],
+            "education": [
+                {
+                    "institution": "MIT",
+                    "degree": "Ph.D.",
+                    "field_of_study": "Physics",
+                    "graduation_year": 2020,
+                    "education_level": 11,
+                    "bullet_points": [],
+                }
+            ],
+        }
+        parsed = ParsedResume.from_dict(data)
+        self.assertEqual(parsed.education[0].education_level, 11)
+
+        out = parsed.to_dict()
+        self.assertEqual(out["education"][0]["education_level"], 11)
+
+    def test_education_level_none_when_absent(self) -> None:
+        edu = ResumeEducation.from_dict({
+            "institution": "Community College",
+            "degree": None,
+            "field_of_study": None,
+            "graduation_year": None,
+            "bullet_points": [],
+        })
+        self.assertIsNone(edu.education_level)
+
+    def test_education_level_rejects_out_of_range(self) -> None:
+        with self.assertRaises(ValueError):
+            ResumeEducation.from_dict({
+                "institution": "School",
+                "education_level": 13,
+            })
+        with self.assertRaises(ValueError):
+            ResumeEducation.from_dict({
+                "institution": "School",
+                "education_level": 0,
+            })
 
 
 if __name__ == "__main__":

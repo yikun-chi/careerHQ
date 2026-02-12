@@ -72,6 +72,7 @@ RESUME_PARSE_SCHEMA: Dict[str, Any] = {
                     "degree",
                     "field_of_study",
                     "graduation_year",
+                    "education_level",
                     "bullet_points",
                 ],
                 "properties": {
@@ -79,6 +80,10 @@ RESUME_PARSE_SCHEMA: Dict[str, Any] = {
                     "degree": {"type": ["string", "null"]},
                     "field_of_study": {"type": ["string", "null"]},
                     "graduation_year": {"type": ["integer", "null"]},
+                    "education_level": {
+                        "type": "integer",
+                        "enum": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    },
                     "bullet_points": {
                         "type": "array",
                         "items": {"type": "string"},
@@ -111,6 +116,21 @@ _RESUME_PARSE_INSTRUCTIONS_TEMPLATE = """You extract structured resume data.
 - Set "occupation_id" to the O*NET code (e.g. "15-1252.00") and "occupation_title" to the
   official title (the text before the "|"). Both must come from the SAME row.
 - You MUST pick from this list — do not invent IDs or titles.
+
+## Education level classification
+For each education entry, set "education_level" to the best matching level:
+ 1 = Less than a High School Diploma
+ 2 = High School Diploma (or GED)
+ 3 = Post-Secondary Certificate (vocational/trade certificate)
+ 4 = Some College Courses (attended college but no degree)
+ 5 = Associate's Degree (A.A., A.S.)
+ 6 = Bachelor's Degree (B.A., B.S., B.Eng., etc.)
+ 7 = Post-Baccalaureate Certificate
+ 8 = Master's Degree (M.A., M.S., M.Eng., MBA, etc.)
+ 9 = Post-Master's Certificate
+10 = First Professional Degree (J.D., M.D., D.D.S., Pharm.D., etc.)
+11 = Doctoral Degree (Ph.D., Ed.D., etc.)
+12 = Post-Doctoral Training
 
 ## General rules
 - Return only valid JSON matching the provided schema.
