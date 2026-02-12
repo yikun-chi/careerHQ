@@ -21,7 +21,15 @@
       "Bash(dir:*)",
       "Bash(/c/Python311/python.exe -m pytest:*)",
       "Bash(/c/Users/yikun/AppData/Local/Programs/Python/Python*/python.exe)",
-      "Bash(python3 -m pytest:*)"
+      "Bash(python3 -m pytest:*)",
+      "Bash(set RUN_LIVE_OPENAI_TESTS=1)",
+      "Bash(cmd /c \"set RUN_LIVE_OPENAI_TESTS=1&& python -m unittest tests.test_resume_parser.TestParseResumeWithOpenAI -v\")",
+      "Bash($env:RUN_LIVE_OPENAI_TESTS=\"1\")",
+      "Bash(RUN_LIVE_OPENAI_TESTS=1 python -m unittest:*)",
+      "Bash(RUN_LIVE_OPENAI_TESTS=1 python:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
