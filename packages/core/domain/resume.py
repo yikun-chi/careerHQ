@@ -79,6 +79,8 @@ class ResumeJob:
 
     job_title: str
     company_title: str
+    occupation_id: str
+    occupation_title: str
     years_of_experience: float
     bullet_points: List[str] = field(default_factory=list)
     projects: List[ResumeProject] = field(default_factory=list)
@@ -90,10 +92,16 @@ class ResumeJob:
 
         job_title = _coerce_optional_string(data.get("job_title"), "job_title")
         company_title = _coerce_optional_string(data.get("company_title"), "company_title")
+        occupation_id = _coerce_optional_string(data.get("occupation_id"), "occupation_id")
+        occupation_title = _coerce_optional_string(data.get("occupation_title"), "occupation_title")
         if job_title is None:
             raise ValueError("job_title is required")
         if company_title is None:
             raise ValueError("company_title is required")
+        if occupation_id is None:
+            raise ValueError("occupation_id is required")
+        if occupation_title is None:
+            raise ValueError("occupation_title is required")
 
         raw_projects = data.get("projects") or []
         if not isinstance(raw_projects, list):
@@ -102,6 +110,8 @@ class ResumeJob:
         return cls(
             job_title=job_title,
             company_title=company_title,
+            occupation_id=occupation_id,
+            occupation_title=occupation_title,
             years_of_experience=_coerce_years(data.get("years_of_experience")),
             bullet_points=_as_string_list(data.get("bullet_points"), "job bullet_points"),
             projects=[ResumeProject.from_dict(item) for item in raw_projects],
@@ -171,6 +181,8 @@ class ParsedResume:
                 {
                     "job_title": job.job_title,
                     "company_title": job.company_title,
+                    "occupation_id": job.occupation_id,
+                    "occupation_title": job.occupation_title,
                     "years_of_experience": job.years_of_experience,
                     "bullet_points": job.bullet_points,
                     "projects": [

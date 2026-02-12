@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import csv
 from pathlib import Path
-from typing import Any, Dict, Mapping, Optional, Union
+from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, Union
 
 from packages.core.domain.resume import ParsedResume
 from packages.core.ports.llm_provider import LLMProvider
@@ -21,6 +22,8 @@ RESUME_PARSE_SCHEMA: Dict[str, Any] = {
                 "required": [
                     "job_title",
                     "company_title",
+                    "occupation_id",
+                    "occupation_title",
                     "years_of_experience",
                     "bullet_points",
                     "projects",
@@ -28,6 +31,8 @@ RESUME_PARSE_SCHEMA: Dict[str, Any] = {
                 "properties": {
                     "job_title": {"type": "string"},
                     "company_title": {"type": "string"},
+                    "occupation_id": {"type": "string"},
+                    "occupation_title": {"type": "string"},
                     "years_of_experience": {"type": "number"},
                     "bullet_points": {
                         "type": "array",
@@ -84,16 +89,101 @@ RESUME_PARSE_SCHEMA: Dict[str, Any] = {
     },
 }
 
-RESUME_PARSE_INSTRUCTIONS = """You extract structured resume data.
+_RESUME_PARSE_INSTRUCTIONS_TEMPLATE = """You extract structured resume data.
 
-Rules:
+## Job extraction rules
+- Each distinct employer/company is ONE job entry. Do NOT split one employer into multiple jobs.
+- "job_title" is the role/title the person held at that company (e.g. "Analytics Experienced Associate").
+- "company_title" is the employer name. Every job MUST have a company_title — never leave it empty.
+- If multiple named projects or sub-roles appear under the same employer, put them in the "projects"
+  array of that single job entry. Each project gets a "project_name" and its own "bullet_points".
+- Bullet points that are not under a specific project go in the job-level "bullet_points" array.
+- Items listed as standalone personal projects (no employer) should be omitted from "jobs".
+  Instead, capture their skills in the "skills" array.
+- Items in an "Additional Experience" or similar section that have an employer (e.g. "Intern, IBM")
+  are separate job entries — each with their own company_title and job_title.
+- "years_of_experience" must be numeric. Estimate from dates when possible.
+
+## Occupation matching
+- For each job, match it to the single best O*NET occupation from the list below.
+  Consider both the official title AND the alternate titles when deciding the best match.
+  Pick the occupation whose scope and duties most closely match the job described.
+- Set "occupation_id" to the O*NET code (e.g. "15-1252.00") and "occupation_title" to the
+  official title (the text before the "|"). Both must come from the SAME row.
+- You MUST pick from this list — do not invent IDs or titles.
+
+## General rules
 - Return only valid JSON matching the provided schema.
 - Do not fabricate information that is not present in the resume.
 - Keep bullet points concise and factual.
-- Include nested projects under each job when they are explicitly present.
-- years_of_experience must be numeric and represent duration for each job.
 - Use empty arrays when information is unavailable.
+
+## O*NET occupations (ID | Title | Alternate titles)
+{occupation_list}
 """
+
+# Keep the old constant for backward compatibility in tests using a provider
+# that doesn't need occupation matching.
+RESUME_PARSE_INSTRUCTIONS = _RESUME_PARSE_INSTRUCTIONS_TEMPLATE
+
+
+def _load_occupation_data() -> Tuple[
+    List[Tuple[str, str]], Dict[str, List[str]], Set[str]
+]:
+    """Load occupation titles and alternate titles.
+
+    Returns
+    -------
+    occupations : List[Tuple[str, str]]
+        (occupation_id, occupation_name) pairs.
+    alt_titles : Dict[str, List[str]]
+        Mapping of occupation_id to list of alternate titles.
+    valid_ids : Set[str]
+        Set of all valid occupation IDs for validation.
+    """
+    from packages.core.domain.occupation_populate import load_occupations_list
+    from packages.core.domain.occupation_initialize import get_data_dir
+
+    occupations = [(oid, name) for oid, name, _ in load_occupations_list()]
+    valid_ids = {oid for oid, _ in occupations}
+
+    alt_titles: Dict[str, List[str]] = {}
+    alt_path = get_data_dir() / "Alternate Titles.txt"
+    with open(alt_path, "r", encoding="utf-8") as f:
+        reader = csv.reader(f, delimiter="\t")
+        next(reader)  # skip header
+        for row in reader:
+            if len(row) < 2:
+                continue
+            occ_id = row[0].strip()
+            alt_title = row[1].strip()
+            if occ_id and alt_title and occ_id in valid_ids:
+                alt_titles.setdefault(occ_id, []).append(alt_title)
+
+    return occupations, alt_titles, valid_ids
+
+
+def build_resume_parse_instructions(
+    occupation_data: Optional[
+        Tuple[List[Tuple[str, str]], Dict[str, List[str]]]
+    ] = None,
+) -> str:
+    """Build the full LLM instructions with occupation titles + alternates."""
+    if occupation_data is None:
+        occupations, alt_titles, _ = _load_occupation_data()
+    else:
+        occupations, alt_titles = occupation_data
+
+    lines: List[str] = []
+    for occ_id, occ_name in occupations:
+        alts = alt_titles.get(occ_id, [])
+        if alts:
+            lines.append(f"{occ_id} | {occ_name} | {', '.join(alts)}")
+        else:
+            lines.append(f"{occ_id} | {occ_name}")
+
+    listing = "\n".join(lines)
+    return _RESUME_PARSE_INSTRUCTIONS_TEMPLATE.format(occupation_list=listing)
 
 
 def parse_resume_file(
@@ -101,19 +191,34 @@ def parse_resume_file(
     *,
     llm_provider: LLMProvider,
     schema: Optional[Mapping[str, Any]] = None,
-    instructions: str = RESUME_PARSE_INSTRUCTIONS,
+    instructions: Optional[str] = None,
 ) -> ParsedResume:
     """Parse a PDF/Word resume into normalized structured output."""
     normalized_path = Path(resume_path)
     if not normalized_path.exists():
         raise FileNotFoundError(f"Resume file not found: {normalized_path}")
 
+    if instructions is None:
+        instructions = build_resume_parse_instructions()
+
     payload = llm_provider.parse_resume(
         resume_path=normalized_path,
         schema=schema or RESUME_PARSE_SCHEMA,
         instructions=instructions,
     )
-    return ParsedResume.from_dict(dict(payload))
+
+    parsed = ParsedResume.from_dict(dict(payload))
+
+    # Validate that returned occupation_ids are in the database
+    _, _, valid_ids = _load_occupation_data()
+    for job in parsed.jobs:
+        if job.occupation_id not in valid_ids:
+            raise ValueError(
+                f"LLM returned unknown occupation_id '{job.occupation_id}' "
+                f"for job '{job.job_title}'. Not in O*NET database."
+            )
+
+    return parsed
 
 
 def parse_resume_with_openai(

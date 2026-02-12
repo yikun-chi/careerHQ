@@ -1,6 +1,5 @@
-"""Tests for resume parsing use case."""
+"""Unit tests for resume parsing use case (no external API calls)."""
 
-import os
 import sys
 import tempfile
 import unittest
@@ -10,7 +9,7 @@ from typing import Any, Dict, Mapping
 # Add project root for imports.
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from packages.core.use_cases.process_resume import parse_resume_file, parse_resume_with_openai
+from packages.core.use_cases.process_resume import parse_resume_file
 
 
 class FakeResumeLLMProvider:
@@ -44,6 +43,8 @@ class TestParseResumeFile(unittest.TestCase):
                 {
                     "job_title": "Software Engineer",
                     "company_title": "Example Corp",
+                    "occupation_id": "15-1252.00",
+                    "occupation_title": "Software Developers",
                     "years_of_experience": 2.5,
                     "bullet_points": ["Built internal API", "Reduced latency by 30%"],
                     "projects": [
@@ -73,6 +74,8 @@ class TestParseResumeFile(unittest.TestCase):
         self.assertEqual(len(parsed.jobs), 1)
         self.assertEqual(parsed.jobs[0].job_title, "Software Engineer")
         self.assertEqual(parsed.jobs[0].company_title, "Example Corp")
+        self.assertEqual(parsed.jobs[0].occupation_id, "15-1252.00")
+        self.assertEqual(parsed.jobs[0].occupation_title, "Software Developers")
         self.assertAlmostEqual(parsed.jobs[0].years_of_experience, 2.5)
         self.assertEqual(parsed.jobs[0].projects[0].project_name, "Realtime Analytics")
         self.assertEqual(parsed.skills, ["Python", "SQL", "FastAPI"])
@@ -85,30 +88,6 @@ class TestParseResumeFile(unittest.TestCase):
         provider = FakeResumeLLMProvider({"jobs": [], "skills": [], "education": []})
         with self.assertRaises(FileNotFoundError):
             parse_resume_file("does_not_exist.pdf", llm_provider=provider)
-
-
-@unittest.skipUnless(
-    os.getenv("RUN_LIVE_OPENAI_TESTS") == "1",
-    "Set RUN_LIVE_OPENAI_TESTS=1 to run live OpenAI integration tests.",
-)
-class TestParseResumeWithOpenAI(unittest.TestCase):
-    """Live integration test against OpenAI Responses API."""
-
-    def test_parse_test_resume_pdf_live(self) -> None:
-        resume_path = Path(__file__).parent / "test_data" / "test_resume.pdf"
-        try:
-            parsed = parse_resume_with_openai(resume_path)
-        except RuntimeError as exc:
-            if "Failed to reach OpenAI Responses API" in str(exc):
-                self.skipTest(f"Network unavailable for live OpenAI test: {exc}")
-            raise
-
-        self.assertGreaterEqual(len(parsed.jobs), 1)
-        self.assertGreaterEqual(len(parsed.skills), 1)
-        for job in parsed.jobs:
-            self.assertTrue(job.job_title)
-            self.assertTrue(job.company_title)
-            self.assertGreaterEqual(job.years_of_experience, 0.0)
 
 
 if __name__ == "__main__":
