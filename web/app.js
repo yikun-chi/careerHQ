@@ -222,10 +222,6 @@ async function handleCareerAnalysis() {
         const data = await res.json();
         renderCareerResults(data);
 
-        if (data.follow_up_questions && data.follow_up_questions.length) {
-            pendingQuestions = data.follow_up_questions;
-            renderFollowUpQuestions(data.follow_up_questions);
-        }
     } catch (e) {
         spinnerMsg.remove();
         addMsg("Network error: " + e.message, "bot error-msg");
@@ -241,9 +237,15 @@ function renderCareerResults(data) {
     let html = "<h3>Career Matches</h3>";
 
     for (const m of data.matches) {
+        const hoverDetails = [
+            `Occupation ID: ${m.occupation_id || "N/A"}`,
+            `Matched Categories: ${(m.matched_categories || []).join(", ") || "None"}`,
+            `Match Score: ${m.match_count}/${m.total_categories}`,
+        ].join("\n");
+
         html += '<div class="career-match">';
         html += '<div class="match-header">';
-        html += '<span class="match-name">' + escHtml(m.occupation_name) + '</span>';
+        html += '<span class="match-name" title="' + escAttr(hoverDetails) + '">' + escHtml(m.occupation_name) + '</span>';
         html += '<span class="match-badge">' + m.match_count + '/' + m.total_categories + '</span>';
         html += '</div>';
         html += '<div class="match-categories">';
@@ -255,6 +257,25 @@ function renderCareerResults(data) {
     }
 
     addCard(html);
+
+    if (data.follow_up_questions && data.follow_up_questions.length) {
+        pendingQuestions = data.follow_up_questions;
+        renderImproveMatchingPrompt();
+    }
+}
+
+function renderImproveMatchingPrompt() {
+    addMsg(
+        'Want to improve matching through user input?<br><br>' +
+        '<button class="action-btn" id="show-followup-btn">Improve Matching Through User Input</button>',
+        "bot"
+    );
+
+    document.getElementById("show-followup-btn").addEventListener("click", () => {
+        const btn = document.getElementById("show-followup-btn");
+        if (btn) btn.disabled = true;
+        renderFollowUpQuestions(pendingQuestions);
+    });
 }
 
 function renderFollowUpQuestions(questions) {
@@ -322,8 +343,13 @@ function renderRefinedResults(data) {
 
     let html = "<h3>Improved Top 3 Career Recommendations</h3>";
     data.top_careers.forEach((career, index) => {
+        const hoverDetails = [
+            `Occupation ID: ${career.occupation_id || "N/A"}`,
+            `Why this match improved: ${career.reason || "No additional explanation available."}`,
+        ].join("\n");
+
         html += '<div class="refined-career">';
-        html += '<div class="refined-title">#' + (index + 1) + ' ' + escHtml(career.occupation_name) + '</div>';
+        html += '<div class="refined-title" title="' + escAttr(hoverDetails) + '">#' + (index + 1) + ' ' + escHtml(career.occupation_name) + '</div>';
         html += '<div class="refined-reason">' + escHtml(career.reason) + '</div>';
         html += '</div>';
     });
