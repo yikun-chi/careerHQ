@@ -107,6 +107,7 @@ async def upload_resume(file: UploadFile):
     ]
 
     return {
+        "career_questions": app_state.get("career_questions", []),
         "jobs": jobs,
         "education": education,
         "resume_skills": parsed.skills,
