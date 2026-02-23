@@ -30,3 +30,13 @@ class LLMProvider(Protocol):
 
         Returns a schema-shaped dictionary with attribute mappings.
         """
+
+    def refine_career_matches(
+        self,
+        *,
+        matches: List[Mapping[str, Any]],
+        answers: List[Mapping[str, str]],
+        schema: Mapping[str, Any],
+        instructions: str,
+    ) -> Mapping[str, Any]:
+        """Refine matched occupations with follow-up user answers."""

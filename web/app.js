@@ -2,6 +2,8 @@ const chat = document.getElementById("chat-history");
 const zone = document.getElementById("upload-zone");
 const fileInput = document.getElementById("file-input");
 
+let pendingQuestions = [];
+
 function addMsg(html, cls) {
     const d = document.createElement("div");
     d.className = "msg " + cls;
@@ -17,14 +19,13 @@ function addCard(html) {
     d.innerHTML = html;
     chat.appendChild(d);
     chat.scrollTop = chat.scrollHeight;
+    return d;
 }
 
-// Greeting
 window.addEventListener("DOMContentLoaded", () => {
     addMsg("Welcome to CareerHQ! Upload your resume to discover your top skills, abilities, and work values.", "bot");
 });
 
-// Drag-and-drop
 zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("dragover"); });
 zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
 zone.addEventListener("drop", e => {
@@ -33,7 +34,6 @@ zone.addEventListener("drop", e => {
     if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
 });
 
-// Click to browse
 zone.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", () => {
     if (fileInput.files.length) handleFile(fileInput.files[0]);
@@ -44,7 +44,6 @@ async function handleFile(file) {
 
     const spinnerMsg = addMsg('<span class="spinner"></span> Analyzing <b>' + escHtml(file.name) + '</b>... This takes 30-60 seconds.', "bot");
 
-    // Disable upload zone
     zone.style.pointerEvents = "none";
     zone.style.opacity = "0.5";
 
@@ -142,7 +141,6 @@ function enforceMaxSelections(inputName, maxSelections) {
 }
 
 function renderResults(data) {
-    // Jobs
     if (data.jobs && data.jobs.length) {
         let html = "<h3>Work Experience</h3>";
         for (const j of data.jobs) {
@@ -154,7 +152,6 @@ function renderResults(data) {
         addCard(html);
     }
 
-    // Education
     if (data.education && data.education.length) {
         let html = "<h3>Education</h3>";
         for (const e of data.education) {
@@ -167,7 +164,6 @@ function renderResults(data) {
         addCard(html);
     }
 
-    // Skills
     if (data.resume_skills && data.resume_skills.length) {
         let html = "<h3>Skills from Resume</h3><div class='skills-list'>";
         for (const s of data.resume_skills) html += '<span class="skill-pill">' + escHtml(s) + "</span>";
@@ -175,7 +171,6 @@ function renderResults(data) {
         addCard(html);
     }
 
-    // Attribute sections
     if (data.attribute_sections) {
         let html = "<h3>Profile Attributes</h3>";
         for (const section of data.attribute_sections) {
@@ -204,10 +199,8 @@ function renderResults(data) {
     );
     document.getElementById("run-career-btn").addEventListener("click", handleCareerAnalysis);
 
-    // Re-enable upload
-    const zone2 = document.getElementById("upload-zone");
-    zone2.style.pointerEvents = "";
-    zone2.style.opacity = "";
+    zone.style.pointerEvents = "";
+    zone.style.opacity = "";
 }
 
 async function handleCareerAnalysis() {
@@ -228,6 +221,11 @@ async function handleCareerAnalysis() {
 
         const data = await res.json();
         renderCareerResults(data);
+
+        if (data.follow_up_questions && data.follow_up_questions.length) {
+            pendingQuestions = data.follow_up_questions;
+            renderFollowUpQuestions(data.follow_up_questions);
+        }
     } catch (e) {
         spinnerMsg.remove();
         addMsg("Network error: " + e.message, "bot error-msg");
@@ -259,9 +257,83 @@ function renderCareerResults(data) {
     addCard(html);
 }
 
+function renderFollowUpQuestions(questions) {
+    let html = '<h3>Quick Preference Questions</h3>';
+    html += '<p class="followup-helper">Answer these to improve your top picks.</p>';
+
+    questions.forEach((q, idx) => {
+        html += '<label class="followup-label" for="followup-' + idx + '">' + escHtml(q) + '</label>';
+        html += '<textarea class="followup-input" id="followup-' + idx + '" rows="2" placeholder="Type your answer..."></textarea>';
+    });
+
+    html += '<button class="action-btn" id="refine-career-btn">Improve Top Matches</button>';
+
+    addCard(html);
+    document.getElementById("refine-career-btn").addEventListener("click", handleRefineCareerMatches);
+}
+
+async function handleRefineCareerMatches() {
+    const btn = document.getElementById("refine-career-btn");
+    if (btn) btn.disabled = true;
+
+    const answers = pendingQuestions.map((question, idx) => ({
+        question,
+        answer: document.getElementById("followup-" + idx)?.value?.trim() || "",
+    })).filter(item => item.answer);
+
+    if (!answers.length) {
+        addMsg("Please answer at least one follow-up question before refining.", "bot error-msg");
+        if (btn) btn.disabled = false;
+        return;
+    }
+
+    const spinnerMsg = addMsg('<span class="spinner"></span> Re-ranking careers with your preferences...', "bot");
+
+    try {
+        const res = await fetch("/api/career-analysis/refine", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ answers }),
+        });
+
+        spinnerMsg.remove();
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ detail: res.statusText }));
+            addMsg("Error: " + (err.detail || "Refinement failed"), "bot error-msg");
+            if (btn) btn.disabled = false;
+            return;
+        }
+
+        const data = await res.json();
+        renderRefinedResults(data);
+    } catch (e) {
+        spinnerMsg.remove();
+        addMsg("Network error: " + e.message, "bot error-msg");
+        if (btn) btn.disabled = false;
+    }
+}
+
+function renderRefinedResults(data) {
+    if (!data.top_careers || !data.top_careers.length) {
+        addMsg("Could not generate refined recommendations. Please try again.", "bot");
+        return;
+    }
+
+    let html = "<h3>Improved Top 3 Career Recommendations</h3>";
+    data.top_careers.forEach((career, index) => {
+        html += '<div class="refined-career">';
+        html += '<div class="refined-title">#' + (index + 1) + ' ' + escHtml(career.occupation_name) + '</div>';
+        html += '<div class="refined-reason">' + escHtml(career.reason) + '</div>';
+        html += '</div>';
+    });
+
+    addCard(html);
+}
+
 function escHtml(s) {
     if (s == null) return "";
-    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;");
 }
 
 function escAttr(s) {
