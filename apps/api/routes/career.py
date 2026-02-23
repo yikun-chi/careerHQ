@@ -16,11 +16,19 @@ from packages.infra.llm.client import OpenAIResponsesClient
 
 router = APIRouter()
 
-FOLLOW_UP_QUESTIONS = [
+LEGACY_FOLLOW_UP_QUESTIONS = [
     "What kind of work environment do you prefer (e.g., remote, office, hands-on, fieldwork)?",
     "Which factors matter most to you right now (pick up to 3): salary, growth, stability, impact, flexibility, creativity?",
     "Do you have any constraints or goals for your next role (location, schedule, industry, leadership, certification)?",
 ]
+
+
+def _get_follow_up_questions() -> list[str]:
+    """Use the configured 6 career questions as refinement prompts."""
+    configured = app_state.get("career_questions") or []
+    prompts = [q.get("prompt", "").strip() for q in configured if isinstance(q, dict)]
+    prompts = [p for p in prompts if p]
+    return prompts or LEGACY_FOLLOW_UP_QUESTIONS
 
 
 class QuestionAnswer(BaseModel):
@@ -51,7 +59,7 @@ async def career_analysis():
 
     return {
         "matches": matches,
-        "follow_up_questions": FOLLOW_UP_QUESTIONS,
+        "follow_up_questions": _get_follow_up_questions(),
     }
 
 
