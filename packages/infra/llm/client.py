@@ -11,6 +11,8 @@ from urllib import error, request
 
 from packages.core.ports.llm_provider import LLMProvider
 
+from packages.core.use_cases.refine_career_matches import build_refine_career_user_text
+
 _DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
 _DEFAULT_MODEL = "gpt-4.1"
 _SUPPORTED_EXTENSIONS = {".pdf", ".doc", ".docx"}
@@ -196,6 +198,56 @@ class OpenAIResponsesClient(LLMProvider):
                 "format": {
                     "type": "json_schema",
                     "name": "bullet_attribute_mapping",
+                    "strict": True,
+                    "schema": dict(schema),
+                }
+            },
+        }
+
+        response_payload = self._post_json("/responses", payload)
+        text_output = _extract_output_text(response_payload)
+
+        try:
+            parsed = json.loads(text_output)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Responses API returned non-JSON content: {exc}") from exc
+
+        if not isinstance(parsed, dict):
+            raise ValueError("Responses API output must be a JSON object")
+        return parsed
+
+    def refine_career_matches(
+        self,
+        *,
+        matches: List[Mapping[str, Any]],
+        answers: List[Mapping[str, str]],
+        schema: Mapping[str, Any],
+        instructions: str,
+    ) -> Dict[str, Any]:
+        """Text-only call: refine matched careers based on follow-up answers."""
+        user_text = build_refine_career_user_text(matches=matches, answers=answers)
+
+        payload = {
+            "model": self.model,
+            "input": [
+                {
+                    "role": "system",
+                    "content": [{"type": "input_text", "text": instructions}],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": user_text,
+                        },
+                    ],
+                },
+            ],
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "name": "career_refinement",
                     "strict": True,
                     "schema": dict(schema),
                 }
