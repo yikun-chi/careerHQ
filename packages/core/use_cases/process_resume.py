@@ -142,10 +142,6 @@ For each education entry, set "education_level" to the best matching level:
 {occupation_list}
 """
 
-# Keep the old constant for backward compatibility in tests using a provider
-# that doesn't need occupation matching.
-RESUME_PARSE_INSTRUCTIONS = _RESUME_PARSE_INSTRUCTIONS_TEMPLATE
-
 
 def _load_occupation_data() -> Tuple[
     List[Tuple[str, str]], Dict[str, List[str]], Set[str]
