@@ -73,6 +73,74 @@ async function handleFile(file) {
     }
 }
 
+
+function renderCareerQuestionnaire(questions) {
+    if (!questions || !questions.length) return;
+
+    const card = document.createElement("div");
+    card.className = "result-card";
+
+    const title = document.createElement("h3");
+    title.textContent = "Career Preference Questions";
+    card.appendChild(title);
+
+    questions.forEach((question, index) => {
+        const block = document.createElement("div");
+        block.className = "question-block";
+
+        const prompt = document.createElement("div");
+        prompt.className = "question-prompt";
+        prompt.textContent = `${index + 1}. ${question.prompt}`;
+        block.appendChild(prompt);
+
+        const optionsWrap = document.createElement("div");
+        optionsWrap.className = "question-options";
+
+        const inputType = question.selection === "multi" ? "checkbox" : "radio";
+        const inputName = `question-${question.id}`;
+
+        (question.options || []).forEach((option, optionIndex) => {
+            const optionLabel = document.createElement("label");
+            optionLabel.className = "question-option";
+
+            const optionInput = document.createElement("input");
+            optionInput.type = inputType;
+            optionInput.name = inputName;
+            optionInput.value = option;
+            optionInput.id = `${inputName}-${optionIndex}`;
+
+            if (inputType === "checkbox" && question.max_selections) {
+                optionInput.dataset.maxSelections = String(question.max_selections);
+                optionInput.addEventListener("change", () => enforceMaxSelections(inputName, question.max_selections));
+            }
+
+            const optionText = document.createElement("span");
+            optionText.textContent = option;
+
+            optionLabel.appendChild(optionInput);
+            optionLabel.appendChild(optionText);
+            optionsWrap.appendChild(optionLabel);
+        });
+
+        block.appendChild(optionsWrap);
+        card.appendChild(block);
+    });
+
+    chat.appendChild(card);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+function enforceMaxSelections(inputName, maxSelections) {
+    const checkboxes = Array.from(document.querySelectorAll(`input[name="${inputName}"][type="checkbox"]`));
+    const checked = checkboxes.filter(c => c.checked);
+    const disableUnchecked = checked.length >= maxSelections;
+
+    for (const cb of checkboxes) {
+        if (!cb.checked) cb.disabled = disableUnchecked;
+        else cb.disabled = false;
+    }
+}
+
 function renderResults(data) {
     // Jobs
     if (data.jobs && data.jobs.length) {
@@ -126,6 +194,8 @@ function renderResults(data) {
         }
         addCard(html);
     }
+
+    renderCareerQuestionnaire(data.career_questions || []);
 
     addMsg(
         'Profile complete! Ready to find careers that match your strengths?<br><br>' +

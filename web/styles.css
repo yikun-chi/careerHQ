@@ -262,3 +262,33 @@ body {
     .msg, .result-card { max-width: 95%; }
     .attr-bar .name { width: 100px; }
 }
+
+/* --- Career questions --- */
+.question-block {
+    margin-top: 12px;
+}
+
+.question-prompt {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.question-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.question-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: #444;
+}
+
+.question-option input {
+    margin-top: 2px;
+}

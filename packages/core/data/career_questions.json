@@ -1,0 +1,107 @@
+[
+  {
+    "id": "work_type",
+    "prompt": "What kind of work excites you most?",
+    "selection": "single",
+    "options": [
+      "Solving technical or analytical problems",
+      "Creative and design work",
+      "Working with and helping people",
+      "Teaching, coaching, or developing others",
+      "Strategy and big-picture thinking",
+      "Building and making things",
+      "Operations and organizing",
+      "Business, sales, or commercial work",
+      "Research and writing",
+      "Not sure yet"
+    ]
+  },
+  {
+    "id": "collaboration_style",
+    "prompt": "Do you work better alone or with others?",
+    "selection": "single",
+    "options": [
+      "Working independently with deep focus",
+      "Collaborating closely with a team",
+      "A mix of both",
+      "No preference"
+    ]
+  },
+  {
+    "id": "structure_preference",
+    "prompt": "Do you prefer structure or flexibility in how you work?",
+    "selection": "single",
+    "options": [
+      "Clear goals and defined processes",
+      "Figuring it out as I go",
+      "Somewhere in between",
+      "No preference"
+    ]
+  },
+  {
+    "id": "focus_style",
+    "prompt": "Do you prefer to focus on one thing or juggle many?",
+    "selection": "single",
+    "options": [
+      "Going deep on one thing for a long time",
+      "Switching between different tasks and projects",
+      "No preference"
+    ]
+  },
+  {
+    "id": "industry_interest",
+    "prompt": "What industries or causes are you drawn to?",
+    "selection": "single",
+    "options": [
+      "Software & Tech",
+      "AI & Machine Learning",
+      "Cybersecurity",
+      "Hardware & Deep Tech",
+      "Finance & Banking",
+      "Venture Capital & Private Equity",
+      "Consulting",
+      "Insurance",
+      "Real Estate",
+      "Healthcare & Hospitals",
+      "Biotech & Pharmaceuticals",
+      "Mental Health",
+      "Medical Devices",
+      "Education & EdTech",
+      "Non-profit & Social Impact",
+      "Government & Public Policy",
+      "Legal & Justice",
+      "Climate & Clean Energy",
+      "Environment & Conservation",
+      "Agriculture & Food Systems",
+      "Media & Entertainment",
+      "Sports & Fitness",
+      "Fashion & Beauty",
+      "Food & Beverage",
+      "Travel & Hospitality",
+      "E-commerce & Retail",
+      "Manufacturing & Supply Chain",
+      "Construction & Architecture",
+      "Transportation & Logistics",
+      "Energy & Utilities",
+      "Aerospace & Defense"
+    ]
+  },
+  {
+    "id": "job_priorities",
+    "prompt": "What are your top 2 priorities in a job?",
+    "selection": "multi",
+    "max_selections": 2,
+    "options": [
+      "Compensation",
+      "Stability & security",
+      "Work-life balance",
+      "Learning & growth",
+      "Career advancement",
+      "Autonomy",
+      "Mission & impact",
+      "Creativity",
+      "Community & belonging",
+      "Prestige"
+    ]
+  }
+]

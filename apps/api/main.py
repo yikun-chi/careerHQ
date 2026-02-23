@@ -1,6 +1,7 @@
 """CareerHQ FastAPI application."""
 
 from contextlib import asynccontextmanager
+import json
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -14,12 +15,14 @@ from packages.core.use_cases.process_resume import build_resume_parse_instructio
 app_state: dict = {}
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
+QUESTIONS_CONFIG_PATH = Path(__file__).resolve().parents[2] / "packages" / "core" / "data" / "career_questions.json"
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app_state["occupations"] = load_occupations()
     app_state["resume_instructions"] = build_resume_parse_instructions()
+    app_state["career_questions"] = json.loads(QUESTIONS_CONFIG_PATH.read_text())
     yield
     app_state.clear()
 
