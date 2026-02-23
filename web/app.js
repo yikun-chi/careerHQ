@@ -3,6 +3,14 @@ const zone = document.getElementById("upload-zone");
 const fileInput = document.getElementById("file-input");
 
 let pendingQuestions = [];
+const DEFAULT_FOLLOW_UP_QUESTIONS = [
+    "What kind of work excites you most?",
+    "Do you work better alone or with others?",
+    "Do you prefer structure or flexibility in how you work?",
+    "Do you prefer to focus on one thing or juggle many?",
+    "What industries or causes are you drawn to?",
+    "What are your top 2 priorities in a job?",
+];
 
 function addMsg(html, cls) {
     const d = document.createElement("div");
@@ -258,8 +266,12 @@ function renderCareerResults(data) {
 
     addCard(html);
 
-    if (data.follow_up_questions && data.follow_up_questions.length) {
-        pendingQuestions = data.follow_up_questions;
+    const followUpQuestions = Array.isArray(data.follow_up_questions) && data.follow_up_questions.length
+        ? data.follow_up_questions
+        : DEFAULT_FOLLOW_UP_QUESTIONS;
+
+    if (followUpQuestions.length) {
+        pendingQuestions = followUpQuestions;
         renderImproveMatchingPrompt();
     }
 }
