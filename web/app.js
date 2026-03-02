@@ -2,15 +2,7 @@ const chat = document.getElementById("chat-history");
 const zone = document.getElementById("upload-zone");
 const fileInput = document.getElementById("file-input");
 
-let pendingQuestions = [];
-const DEFAULT_FOLLOW_UP_QUESTIONS = [
-    "What kind of work excites you most?",
-    "Do you work better alone or with others?",
-    "Do you prefer structure or flexibility in how you work?",
-    "Do you prefer to focus on one thing or juggle many?",
-    "What industries or causes are you drawn to?",
-    "What are your top 2 priorities in a job?",
-];
+let careerQuestionsData = [];
 
 function addMsg(html, cls) {
     const d = document.createElement("div");
@@ -83,6 +75,7 @@ async function handleFile(file) {
 
 function renderCareerQuestionnaire(questions) {
     if (!questions || !questions.length) return;
+    careerQuestionsData = questions;
 
     const card = document.createElement("div");
     card.className = "result-card";
@@ -146,6 +139,15 @@ function enforceMaxSelections(inputName, maxSelections) {
         if (!cb.checked) cb.disabled = disableUnchecked;
         else cb.disabled = false;
     }
+}
+
+function collectQuestionnaireAnswers() {
+    return careerQuestionsData.map(q => {
+        const checked = Array.from(document.querySelectorAll(`input[name="question-${q.id}"]:checked`));
+        if (!checked.length) return null;
+        const answer = checked.map(el => el.value).join(", ");
+        return { question: q.prompt, answer };
+    }).filter(Boolean);
 }
 
 function renderResults(data) {
@@ -266,42 +268,18 @@ function renderCareerResults(data) {
 
     addCard(html);
 
-    const followUpQuestions = Array.isArray(data.follow_up_questions) && data.follow_up_questions.length
-        ? data.follow_up_questions
-        : DEFAULT_FOLLOW_UP_QUESTIONS;
-
-    if (followUpQuestions.length) {
-        pendingQuestions = followUpQuestions;
+    if (careerQuestionsData.length) {
         renderImproveMatchingPrompt();
     }
 }
 
 function renderImproveMatchingPrompt() {
     addMsg(
-        'Want to improve matching through user input?<br><br>' +
-        '<button class="action-btn" id="show-followup-btn">Improve Matching Through User Input</button>',
+        'Want to improve matching based on your preferences?<br><br>' +
+        '<button class="action-btn" id="refine-career-btn">Improve Matching With Your Preferences</button>',
         "bot"
     );
 
-    document.getElementById("show-followup-btn").addEventListener("click", () => {
-        const btn = document.getElementById("show-followup-btn");
-        if (btn) btn.disabled = true;
-        renderFollowUpQuestions(pendingQuestions);
-    });
-}
-
-function renderFollowUpQuestions(questions) {
-    let html = '<h3>Quick Preference Questions</h3>';
-    html += '<p class="followup-helper">Answer these to improve your top picks.</p>';
-
-    questions.forEach((q, idx) => {
-        html += '<label class="followup-label" for="followup-' + idx + '">' + escHtml(q) + '</label>';
-        html += '<textarea class="followup-input" id="followup-' + idx + '" rows="2" placeholder="Type your answer..."></textarea>';
-    });
-
-    html += '<button class="action-btn" id="refine-career-btn">Improve Top Matches</button>';
-
-    addCard(html);
     document.getElementById("refine-career-btn").addEventListener("click", handleRefineCareerMatches);
 }
 
@@ -309,13 +287,10 @@ async function handleRefineCareerMatches() {
     const btn = document.getElementById("refine-career-btn");
     if (btn) btn.disabled = true;
 
-    const answers = pendingQuestions.map((question, idx) => ({
-        question,
-        answer: document.getElementById("followup-" + idx)?.value?.trim() || "",
-    })).filter(item => item.answer);
+    const answers = collectQuestionnaireAnswers();
 
     if (!answers.length) {
-        addMsg("Please answer at least one follow-up question before refining.", "bot error-msg");
+        addMsg("Please answer at least one career preference question before refining.", "bot error-msg");
         if (btn) btn.disabled = false;
         return;
     }
