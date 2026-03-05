@@ -223,9 +223,10 @@ class OpenAIResponsesClient(LLMProvider):
         answers: List[Mapping[str, str]],
         schema: Mapping[str, Any],
         instructions: str,
+        feedback: str = "",
     ) -> Dict[str, Any]:
-        """Text-only call: refine matched careers based on follow-up answers."""
-        user_text = build_refine_career_user_text(matches=matches, answers=answers)
+        """Text-only call: refine matched careers based on follow-up answers and feedback."""
+        user_text = build_refine_career_user_text(matches=matches, answers=answers, feedback=feedback)
 
         payload = {
             "model": self.model,

@@ -35,10 +35,11 @@ def build_refine_career_instructions() -> str:
     """System instructions for refining initial career matches."""
     return (
         "You are an expert career advisor.\n"
-        "You receive: (1) a list of initially matched occupations ranked by profile overlap and "
-        "(2) a user's follow-up answers about preferences, constraints, and goals.\n"
+        "You receive: (1) a list of initially matched occupations ranked by profile overlap, "
+        "(2) optional free-text feedback from the user, and "
+        "(3) optional follow-up answers about preferences, constraints, and goals.\n"
         "Pick exactly 3 best occupations from the provided list only.\n"
-        "For each pick, explain why it fits the user's profile and answers in 2-4 concise sentences.\n"
+        "For each pick, explain why it fits the user's profile and feedback/answers in 2-4 concise sentences.\n"
         "Do not invent occupations not present in the supplied list.\n"
         "Return only valid JSON matching the schema."
     )
@@ -48,12 +49,20 @@ def build_refine_career_user_text(
     *,
     matches: List[Mapping[str, Any]],
     answers: List[Mapping[str, str]],
+    feedback: str = "",
 ) -> str:
-    """Build user payload text containing answers and the full match list."""
-    rendered_answers = "\n".join(
-        f"- Q: {a.get('question', '').strip()}\n  A: {a.get('answer', '').strip()}"
-        for a in answers
-    )
+    """Build user payload text containing feedback, answers, and the full match list."""
+    sections: List[str] = ["Refine career recommendations using these inputs:\n"]
+
+    if feedback.strip():
+        sections.append(f"## User feedback\n{feedback.strip()}\n")
+
+    if answers:
+        rendered_answers = "\n".join(
+            f"- Q: {a.get('question', '').strip()}\n  A: {a.get('answer', '').strip()}"
+            for a in answers
+        )
+        sections.append(f"## Follow-up answers\n{rendered_answers}\n")
 
     rendered_matches = "\n".join(
         "- "
@@ -62,12 +71,7 @@ def build_refine_career_user_text(
         f"categories: {', '.join(m.get('matched_categories', []))}"
         for m in matches
     )
+    sections.append(f"## All matched occupations\n{rendered_matches}")
 
-    return (
-        "Refine career recommendations using these inputs:\n\n"
-        "## Follow-up answers\n"
-        f"{rendered_answers}\n\n"
-        "## All matched occupations\n"
-        f"{rendered_matches}"
-    )
+    return "\n".join(sections)
 

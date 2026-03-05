@@ -38,5 +38,6 @@ class LLMProvider(Protocol):
         answers: List[Mapping[str, str]],
         schema: Mapping[str, Any],
         instructions: str,
+        feedback: str = "",
     ) -> Mapping[str, Any]:
-        """Refine matched occupations with follow-up user answers."""
+        """Refine matched occupations with follow-up user answers and feedback."""

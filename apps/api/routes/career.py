@@ -37,12 +37,37 @@ class QuestionAnswer(BaseModel):
 
 
 class RefineCareerRequest(BaseModel):
-    answers: list[QuestionAnswer]
+    answers: list[QuestionAnswer] = []
+    feedback: str = ""
+
+
+class AttributeUpdateRequest(BaseModel):
+    capability: float
 
 
 def _build_matches(user, occupations):
     matches = find_matching_occupations(user, occupations)
     return [asdict(m) for m in matches]
+
+
+@router.put("/user/attributes/{attribute_id:path}")
+async def update_user_attribute(attribute_id: str, payload: AttributeUpdateRequest):
+    user = app_state.get("current_user")
+    if user is None:
+        raise HTTPException(status_code=404, detail="No user profile yet. Upload a resume first.")
+
+    attr = user.attributes.get(attribute_id)
+    if attr is None:
+        raise HTTPException(status_code=404, detail=f"Attribute '{attribute_id}' not found.")
+
+    if not (0 <= payload.capability <= 100):
+        raise HTTPException(status_code=400, detail="Capability must be between 0 and 100.")
+
+    attr.capability = payload.capability
+    # Invalidate stale career matches
+    app_state.pop("last_career_matches", None)
+
+    return {"attribute_id": attribute_id, "capability": attr.capability}
 
 
 @router.get("/career-analysis")
@@ -84,8 +109,10 @@ async def refine_career_analysis(payload: RefineCareerRequest):
         for a in payload.answers
         if a.answer.strip()
     ]
-    if not cleaned_answers:
-        raise HTTPException(status_code=400, detail="Please provide at least one answer.")
+    feedback = payload.feedback.strip()
+
+    if not cleaned_answers and not feedback:
+        raise HTTPException(status_code=400, detail="Please provide feedback or answer at least one question.")
 
     provider = OpenAIResponsesClient()
     schema = build_refine_career_schema()
@@ -100,6 +127,7 @@ async def refine_career_analysis(payload: RefineCareerRequest):
                 answers=cleaned_answers,
                 schema=schema,
                 instructions=instructions,
+                feedback=feedback,
             ),
         )
     except Exception as exc:

@@ -292,3 +292,91 @@ body {
 .question-option input {
     margin-top: 2px;
 }
+
+/* --- Editable attribute values --- */
+.editable-value {
+    color: #0066ff;
+    text-decoration: underline dashed #99c2ff;
+    cursor: pointer;
+    user-select: none;
+}
+
+.editable-value:hover {
+    background: #e8f0ff;
+    border-radius: 3px;
+}
+
+.edit-hint {
+    font-size: 11px;
+    color: #999;
+    font-weight: 400;
+    margin-left: 8px;
+}
+
+.attr-edit-input {
+    width: 44px;
+    text-align: right;
+    font-size: 11px;
+    border: 1.5px solid #0066ff;
+    border-radius: 4px;
+    padding: 1px 4px;
+    outline: none;
+    color: #333;
+}
+
+/* --- Feedback panel --- */
+.feedback-panel {
+    margin-top: 8px;
+}
+
+.feedback-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.feedback-textarea {
+    width: 100%;
+    min-height: 72px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.feedback-textarea:focus {
+    border-color: #0066ff;
+    outline: none;
+}
+
+.secondary-btn {
+    background: #fff;
+    color: #0066ff;
+    border: 1.5px solid #0066ff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.secondary-btn:hover {
+    background: #e8f0ff;
+}
+
+.questions-toggle-section {
+    margin-top: 12px;
+}
+
+.feedback-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}

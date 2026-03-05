@@ -38,10 +38,55 @@ class TestRefineCareerHelpers(unittest.TestCase):
                     "answer": "Remote with occasional travel",
                 }
             ],
+            feedback="I prefer leadership roles",
         )
         self.assertIn("Preferred environment?", text)
         self.assertIn("Chief Executives", text)
         self.assertIn("match score: 4/6", text)
+        self.assertIn("I prefer leadership roles", text)
+        self.assertIn("## User feedback", text)
+        self.assertIn("## Follow-up answers", text)
+
+    def test_user_text_with_feedback_only(self):
+        text = build_refine_career_user_text(
+            matches=[
+                {
+                    "occupation_id": "11-1011.00",
+                    "occupation_name": "Chief Executives",
+                    "match_count": 4,
+                    "total_categories": 6,
+                    "matched_categories": ["Abilities", "Knowledge"],
+                }
+            ],
+            answers=[],
+            feedback="I want a creative role with flexible hours",
+        )
+        self.assertIn("## User feedback", text)
+        self.assertIn("I want a creative role with flexible hours", text)
+        self.assertNotIn("## Follow-up answers", text)
+        self.assertIn("Chief Executives", text)
+
+    def test_user_text_with_answers_only(self):
+        text = build_refine_career_user_text(
+            matches=[
+                {
+                    "occupation_id": "11-1011.00",
+                    "occupation_name": "Chief Executives",
+                    "match_count": 4,
+                    "total_categories": 6,
+                    "matched_categories": ["Abilities", "Knowledge"],
+                }
+            ],
+            answers=[
+                {
+                    "question": "Preferred environment?",
+                    "answer": "Remote",
+                }
+            ],
+        )
+        self.assertNotIn("## User feedback", text)
+        self.assertIn("## Follow-up answers", text)
+        self.assertIn("Preferred environment?", text)
 
     def test_instructions_constrain_to_provided_matches(self):
         instructions = build_refine_career_instructions()
