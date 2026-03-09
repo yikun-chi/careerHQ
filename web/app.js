@@ -40,6 +40,11 @@ fileInput.addEventListener("change", () => {
 });
 
 async function handleFile(file) {
+    // Clean restart: clear previous results
+    chat.innerHTML = "";
+    careerQuestionsData = [];
+    addMsg("Welcome to CareerHQ! Upload your resume to discover your top skills, abilities, and work values.", "bot");
+
     addMsg("Uploaded: " + file.name, "user");
 
     const spinnerMsg = addMsg('<span class="spinner"></span> Analyzing <b>' + escHtml(file.name) + '</b>... This takes 30-60 seconds.', "bot");
