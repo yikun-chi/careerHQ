@@ -413,20 +413,19 @@ function renderRefinedResults(data) {
         return;
     }
 
-    let html = "<h3>Top 3 Career Recommendations</h3>";
+    addMsg("<b>Top 3 Career Recommendations</b>", "bot");
     data.top_careers.forEach((career, index) => {
         const hoverDetails = [
             `Occupation ID: ${career.occupation_id || "N/A"}`,
-            `Why this match improved: ${career.reason || "No additional explanation available."}`,
         ].join("\n");
 
-        html += '<div class="refined-career">';
+        let html = '<div class="refined-career">';
         html += '<div class="refined-title" title="' + escAttr(hoverDetails) + '">#' + (index + 1) + ' ' + escHtml(career.occupation_name) + '</div>';
-        html += '<div class="refined-reason">' + escHtml(career.reason) + '</div>';
+        html += '<div class="refined-reason"><b>Profile fit:</b> ' + escHtml(career.profile_fit) + '</div>';
+        html += '<div class="refined-reason"><b>Preference fit:</b> ' + escHtml(career.preference_fit) + '</div>';
         html += '</div>';
+        addCard(html);
     });
-
-    addCard(html);
 }
 
 function escHtml(s) {
