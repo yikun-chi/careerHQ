@@ -418,8 +418,118 @@ function renderRefinedResults(data) {
         html += '<div class="refined-career">';
         html += '<div class="refined-title" title="' + escAttr(hoverDetails) + '">#' + (index + 1) + ' ' + escHtml(career.occupation_name) + '</div>';
         html += '<div class="refined-reason">' + escHtml(career.reason) + '</div>';
+        html += '<button class="roadmap-btn secondary-btn" '
+            + 'data-occupation-id="' + escAttr(career.occupation_id) + '" '
+            + 'data-occupation-name="' + escAttr(career.occupation_name) + '">'
+            + 'Generate Roadmap</button>';
         html += '</div>';
     });
+
+    const card = addCard(html);
+    card.querySelectorAll(".roadmap-btn").forEach(btn => {
+        btn.addEventListener("click", handleGenerateRoadmap);
+    });
+}
+
+async function handleGenerateRoadmap(e) {
+    const btn = e.target;
+    const occupationId = btn.dataset.occupationId;
+    const occupationName = btn.dataset.occupationName;
+
+    btn.disabled = true;
+    btn.textContent = "Generating...";
+
+    const spinnerMsg = addMsg(
+        '<span class="spinner"></span> Building your roadmap to <b>'
+        + escHtml(occupationName) + '</b>... This may take 30-60 seconds.',
+        "bot"
+    );
+
+    try {
+        const res = await fetch("/api/career-roadmap", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                occupation_id: occupationId,
+                occupation_name: occupationName,
+            }),
+        });
+
+        spinnerMsg.remove();
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ detail: res.statusText }));
+            addMsg("Error: " + (err.detail || "Roadmap generation failed"), "bot error-msg");
+            btn.disabled = false;
+            btn.textContent = "Generate Roadmap";
+            return;
+        }
+
+        const data = await res.json();
+        renderRoadmap(data);
+        btn.textContent = "Roadmap Generated";
+    } catch (err) {
+        spinnerMsg.remove();
+        addMsg("Network error: " + err.message, "bot error-msg");
+        btn.disabled = false;
+        btn.textContent = "Generate Roadmap";
+    }
+}
+
+function renderRoadmap(data) {
+    let html = '<div class="roadmap">';
+    html += '<div class="roadmap-header">';
+    html += '<h3>' + escHtml(data.roadmap_title) + '</h3>';
+    html += '<div class="roadmap-meta">';
+    html += '<span class="roadmap-timeline-badge">~' + data.estimated_timeline_months + ' months</span>';
+    html += '</div>';
+    html += '<p class="roadmap-summary">' + escHtml(data.summary) + '</p>';
+    html += '</div>';
+
+    html += '<div class="roadmap-timeline">';
+
+    for (const milestone of data.milestones) {
+        html += '<div class="roadmap-milestone">';
+        html += '<div class="milestone-connector"><div class="milestone-dot"></div><div class="milestone-line"></div></div>';
+        html += '<div class="milestone-content">';
+        html += '<div class="milestone-header">';
+        html += '<span class="milestone-number">Step ' + milestone.milestone_number + '</span>';
+        html += '<span class="milestone-time">' + escHtml(milestone.timeline_months) + ' mo</span>';
+        html += '</div>';
+        html += '<div class="milestone-title">' + escHtml(milestone.title) + '</div>';
+        html += '<div class="milestone-desc">' + escHtml(milestone.description) + '</div>';
+
+        html += '<div class="milestone-actions">';
+        for (const action of milestone.actions) {
+            html += '<div class="action-item">';
+            html += '<div class="action-header">';
+            html += '<span class="action-type-badge action-type-' + escAttr(action.action_type) + '">'
+                + escHtml(action.action_type) + '</span>';
+            html += '<span class="action-title">' + escHtml(action.action_title) + '</span>';
+            html += '</div>';
+            html += '<div class="action-desc">' + escHtml(action.action_description) + '</div>';
+
+            html += '<div class="action-resources">';
+            for (const r of action.resources) {
+                html += '<a class="resource-link" href="' + escAttr(r.url)
+                    + '" target="_blank" rel="noopener noreferrer" title="' + escAttr(r.description) + '">';
+                html += '<span class="resource-type resource-type-' + escAttr(r.resource_type) + '">'
+                    + escHtml(r.resource_type.replace('_', ' ')) + '</span> ';
+                html += escHtml(r.resource_name);
+                html += '</a>';
+            }
+            html += '</div>';
+
+            html += '</div>';
+        }
+        html += '</div>';
+
+        html += '</div>';
+        html += '</div>';
+    }
+
+    html += '</div>';
+    html += '</div>';
 
     addCard(html);
 }
