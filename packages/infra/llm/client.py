@@ -267,6 +267,109 @@ class OpenAIResponsesClient(LLMProvider):
             raise ValueError("Responses API output must be a JSON object")
         return parsed
 
+    def generate_career_roadmap(
+        self,
+        *,
+        user_text: str,
+        schema: Mapping[str, Any],
+        instructions: str,
+    ) -> Dict[str, Any]:
+        """Text-only call: generate a career roadmap from current role to target."""
+        payload = {
+            "model": self.model,
+            "input": [
+                {
+                    "role": "system",
+                    "content": [{"type": "input_text", "text": instructions}],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": user_text,
+                        },
+                    ],
+                },
+            ],
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "name": "career_roadmap",
+                    "strict": True,
+                    "schema": dict(schema),
+                }
+            },
+        }
+
+        response_payload = self._post_json("/responses", payload)
+        text_output = _extract_output_text(response_payload)
+
+        try:
+            parsed = json.loads(text_output)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Responses API returned non-JSON content: {exc}") from exc
+
+        if not isinstance(parsed, dict):
+            raise ValueError("Responses API output must be a JSON object")
+        return parsed
+
+    def validate_and_fix_roadmap_links(
+        self,
+        *,
+        resources: List[Mapping[str, Any]],
+        schema: Mapping[str, Any],
+        instructions: str,
+    ) -> Dict[str, Any]:
+        """Text-only call: validate resource URLs and suggest replacements for invalid ones."""
+        lines = []
+        for i, r in enumerate(resources, 1):
+            name = r.get("resource_name", "")
+            rtype = r.get("resource_type", "")
+            url = r.get("url", "")
+            desc = r.get("description", "")
+            lines.append(f"{i}. {name} | {rtype} | {url} | {desc}")
+        user_text = "Validate the following resource URLs:\n\n" + "\n".join(lines)
+
+        payload = {
+            "model": self.model,
+            "input": [
+                {
+                    "role": "system",
+                    "content": [{"type": "input_text", "text": instructions}],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": user_text,
+                        },
+                    ],
+                },
+            ],
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "name": "link_validation_result",
+                    "strict": True,
+                    "schema": dict(schema),
+                }
+            },
+        }
+
+        response_payload = self._post_json("/responses", payload)
+        text_output = _extract_output_text(response_payload)
+
+        try:
+            parsed = json.loads(text_output)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Responses API returned non-JSON content: {exc}") from exc
+
+        if not isinstance(parsed, dict):
+            raise ValueError("Responses API output must be a JSON object")
+        return parsed
+
     def _post_json(self, path: str, payload: Mapping[str, Any]) -> Dict[str, Any]:
         """POST JSON payload to OpenAI API and return parsed JSON response."""
         url = f"{self.base_url}{path}"

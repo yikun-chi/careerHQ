@@ -34,7 +34,11 @@ The synchronous gateway. FastAPI application defined in `apps/api/main.py`.
 **Routes:**
 - `GET /` — serves `web/index.html` via `FileResponse`
 - `/static/*` — serves CSS/JS from `web/` via `StaticFiles`
-- `POST /api/upload` — the single API endpoint (see `api_contract.md`)
+- `POST /api/upload` — resume upload and profile initialization (see `api_contract.md`)
+- `GET /api/career-analysis` — occupation matching against user profile
+- `POST /api/career-analysis/refine` — LLM-based career match refinement from Q&A
+- `PUT /api/user/attributes/{attribute_id}` — manual capability override
+- `POST /api/career-roadmap` — roadmap generation + URL validation/patching
 
 **Request flow for `/api/upload`:**
 1. Validate file extension (`.pdf`, `.doc`, `.docx`)
@@ -74,12 +78,15 @@ Currently the API calls the use case directly (no task queue). The worker module
 |:---|:---|
 | `process_resume.py` | `parse_resume_file()` — sends resume + O*NET occupation list to LLM, validates output against `RESUME_PARSE_SCHEMA` |
 | `init_profile_from_resume.py` | `init_profile_from_resume()` — orchestrates all 3 phases: occupation-based updates, bullet-to-attribute mapping, education binary attributes. Returns `ProfileInitResult` |
+| `career_analysis.py` | `find_matching_occupations()` — pure scoring algorithm comparing user attributes to all 1016 O*NET occupations; returns top 15 `CareerMatch` objects |
+| `refine_career_matches.py` | `build_refine_career_instructions()`, `build_refine_career_schema()`, `build_refine_career_user_text()` — LLM prompt builders for the career refinement call |
+| `generate_roadmap.py` | `compute_gap_analysis()`, `build_roadmap_schema/instructions/user_text()`, `build_link_validation_schema/instructions()`, `extract_resources_from_roadmap()`, `patch_roadmap_urls()` — all roadmap generation and URL validation helpers |
 
 ### 3.3 Core Ports (`packages/core/ports/`)
 
 | File | Contents |
 |:---|:---|
-| `llm_provider.py` | `LLMProvider` Protocol with two methods: `parse_resume()` and `map_bullets_to_attributes()` |
+| `llm_provider.py` | `LLMProvider` Protocol with five methods: `parse_resume()`, `map_bullets_to_attributes()`, `refine_career_matches()`, `generate_career_roadmap()`, `validate_and_fix_roadmap_links()` |
 
 ### 3.4 Infrastructure (`packages/infra/`)
 
@@ -104,8 +111,11 @@ Vanilla HTML/CSS/JS — no framework, no build step.
 **UI flow:**
 1. Greeting message on page load
 2. User drops or selects a resume file (`.pdf`, `.doc`, `.docx`)
-3. Spinner while the backend processes (30-60 seconds)
+3. Spinner while the backend processes (30–60 seconds)
 4. Result cards rendered: Work Experience, Education, Skills from Resume, Profile Attributes (7 sections with top-5 bar charts)
+5. Career analysis results rendered automatically with ranked occupation matches and follow-up questions
+6. User answers questions; submitting calls `/api/career-analysis/refine` and renders a refined top-career list
+7. Each refined career has a **Generate Roadmap** button → calls `/api/career-roadmap` → renders a milestone timeline with clickable resource links
 
 ## 5. Data Layer
 
@@ -163,3 +173,4 @@ The following features are planned but have no working code:
 - **Telemetry** — Logging and monitoring (infra/telemetry is a stub)
 - **Authentication** — User tokens, session management
 - **Custom attributes** — N-prefixed attributes (personality, age) require user input, not job-derived
+- **Session persistence** — All state (`current_user`, `parsed_resume`, `last_career_matches`, `career_preferences`) is held in `app_state` (in-process dict); restarting the server or a second browser tab loses state

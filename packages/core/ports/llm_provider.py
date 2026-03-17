@@ -41,3 +41,26 @@ class LLMProvider(Protocol):
         feedback: str = "",
     ) -> Mapping[str, Any]:
         """Refine matched occupations with follow-up user answers and feedback."""
+
+    def generate_career_roadmap(
+        self,
+        *,
+        user_text: str,
+        schema: Mapping[str, Any],
+        instructions: str,
+    ) -> Mapping[str, Any]:
+        """Generate a career roadmap from current role to target occupation."""
+
+    def validate_and_fix_roadmap_links(
+        self,
+        *,
+        resources: List[Mapping[str, Any]],
+        schema: Mapping[str, Any],
+        instructions: str,
+    ) -> Mapping[str, Any]:
+        """Validate URL plausibility and suggest replacements for invalid ones.
+
+        Returns dict with keys:
+            - all_valid (bool)
+            - results (list of {url, is_valid, reason, suggested_url})
+        """

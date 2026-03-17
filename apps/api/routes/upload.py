@@ -85,6 +85,7 @@ async def upload_resume(file: UploadFile):
         Path(tmp_path).unlink(missing_ok=True)
 
     app_state["current_user"] = user
+    app_state["parsed_resume"] = parsed
 
     jobs = [
         {

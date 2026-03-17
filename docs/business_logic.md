@@ -337,7 +337,131 @@ For occupation "Management Analysts" (13-1111.00):
 - Top 3 knowledge by IM: `{2.C.1.a, 2.C.4.a, 2.C.1.b}` → overlap with user = 2 → **match**
 - Result: `match_count = 2`, `total_categories = 2`, `matched_categories = ["Abilities", "Knowledge"]`
 
-## 10. Future Considerations
+## 10. Career Refinement — LLM-Based Reranking
+
+**Code:** `build_refine_career_instructions/schema/user_text()` in `packages/core/use_cases/refine_career_matches.py`; `refine_career_matches()` in `OpenAIResponsesClient`
+
+After the algorithmic career analysis returns up to 15 matches, the user answers 6 follow-up questions (work environment, priorities, constraints, etc.) and/or submits free-text feedback. This triggers a single LLM call that reranks and filters the matches using human preferences.
+
+### Input
+
+- Top matches from `find_matching_occupations()` (occupation ID, name, match count, matched categories)
+- Q&A answers (`question` + `answer` pairs)
+- Optional free-text feedback
+
+### Output
+
+```json
+{
+  "top_careers": [
+    {
+      "occupation_id": "15-2051.00",
+      "occupation_name": "Data Scientists",
+      "reason": "Aligns with your analytical background and remote work preference"
+    }
+  ]
+}
+```
+
+The schema is strict; `reason` is always populated. Career preferences (answers + feedback) are stored in `app_state["career_preferences"]` and forwarded to the roadmap endpoint.
+
+---
+
+## 11. Career Roadmap Generation
+
+**Code:** `packages/core/use_cases/generate_roadmap.py`; `generate_career_roadmap()` and `validate_and_fix_roadmap_links()` in `OpenAIResponsesClient`
+
+Triggered by `POST /api/career-roadmap`. Produces a structured 4–6 milestone plan from the user's current role to the chosen target occupation using two sequential LLM calls.
+
+### 11.1 Gap Analysis
+
+**Code:** `compute_gap_analysis()` in `generate_roadmap.py`
+
+Compares the user's attribute capabilities against the target occupation's O*NET element requirements across 5 categories:
+
+| Category | User Prefix | O*NET Prefix | Scale |
+|:---|:---|:---|:---|
+| Abilities | `1.A` | `1.A` | IM × LV / 35 × 100 |
+| Work Styles | `1.D` | `1.D` | (WI + 3) / 6 × 100 |
+| Basic Skills | `3.A` | `2.A` | IM × LV / 35 × 100 |
+| Cross-Functional Skills | `3.B` | `2.B` | IM × LV / 35 × 100 |
+| Knowledge | `3.C` | `2.C` | IM × LV / 35 × 100 |
+
+- **Gap** = `target_normalized − user_capability`. Attributes with `gap > 10` become `gaps` (capped at 15, sorted largest-first).
+- **Strength** = attributes where `user_capability > 50` and no gap exists (capped at 10).
+
+Both lists are passed as context to the roadmap LLM call.
+
+### 11.2 Roadmap LLM Call
+
+**Schema:** Strict JSON via `build_roadmap_schema()`. Structure:
+
+```
+roadmap
+ ├── roadmap_title
+ ├── estimated_timeline_months
+ ├── summary
+ └── milestones (4–6)
+      ├── milestone_number, title, description, timeline_months
+      ├── milestone_type (skill_building | certification | experience | networking | transition | advancement)
+      └── actions (2–4)
+           ├── action_title, action_description
+           ├── action_type (learn | certify | build | network | apply | practice)
+           └── resources (2–3)
+                ├── resource_name, resource_type, url, description
+                └── resource_type (course | book | community | tool | certification_program | website)
+```
+
+**User payload** built by `build_roadmap_user_text()` includes:
+- Current job title + O*NET occupation name
+- Target occupation ID + name
+- Gap analysis (up to 15 entries)
+- User strengths (up to 10 entries)
+- Education background
+- Skills from resume
+- Career preferences from refinement step (if available)
+
+### 11.3 URL Validation and Patching
+
+After the roadmap is generated, a second LLM call validates every resource URL for plausibility.
+
+**`extract_resources_from_roadmap()`** — traverses `milestones → actions → resources` and returns a flat list of all resources with non-empty `url` fields.
+
+**Validation LLM call** receives a numbered list in the format:
+```
+N. resource_name | resource_type | url | description
+```
+
+The LLM assesses each URL using reasoning only (no browsing):
+- Well-formed HTTPS
+- Known, legitimate domain (coursera.org, edx.org, udemy.com, github.com, docs.python.org, etc.)
+- URL path plausibly matches resource name and type
+- No hallucination signals (random characters, mismatched domain/content)
+
+**Schema** (strict):
+```json
+{
+  "all_valid": true,
+  "results": [
+    {
+      "url": "https://original.url",
+      "is_valid": true,
+      "reason": "Known domain, path matches course name",
+      "suggested_url": "https://original.url"
+    }
+  ]
+}
+```
+
+`suggested_url` is always populated — valid URLs echo back the original, invalid URLs get a real replacement for the same resource.
+
+**`patch_roadmap_urls()`** — mutates the roadmap dict in-place, replacing only the URLs for invalid entries. Valid URLs are untouched.
+
+**Best-effort guarantee:** If the validation LLM call itself fails (network error, schema error, etc.), the error is logged as a warning and the original roadmap is returned unchanged — the endpoint never returns a 500 due to validation failure.
+
+---
+
+## 12. Future Considerations
 
 1. **Diminishing returns** — Logarithmic scaling for capability to model mastery plateaus
 2. **Recency weighting** — More recent jobs could have stronger influence

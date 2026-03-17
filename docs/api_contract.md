@@ -104,9 +104,12 @@ Accepts a resume file, runs the full parse-and-profile pipeline synchronously, a
 
 ### Port
 
-`LLMProvider` protocol in `packages/core/ports/llm_provider.py` defines two methods:
+`LLMProvider` protocol in `packages/core/ports/llm_provider.py` defines four methods:
 - `parse_resume()` — file-based structured extraction
 - `map_bullets_to_attributes()` — text-based bullet-to-attribute mapping
+- `refine_career_matches()` — text-based refinement of career matches from user Q&A answers
+- `generate_career_roadmap()` — text-based structured roadmap generation
+- `validate_and_fix_roadmap_links()` — text-based URL plausibility check and replacement
 
 ### Adapter
 
@@ -118,9 +121,12 @@ Accepts a resume file, runs the full parse-and-profile pipeline synchronously, a
 - **HTTP client:** stdlib `urllib` (no `requests` or `httpx` dependency)
 - **Timeout:** 120 seconds
 
-Two LLM calls are made per upload:
+LLM calls per user journey:
 1. **Resume parse** — file + system prompt with 1016 O*NET occupations and alternate titles → structured JSON (jobs, skills, education)
 2. **Bullet mapping** — numbered bullet texts + attribute catalog → attribute mappings with relevance scores
+3. **Career refinement** *(optional)* — initial matches + follow-up Q&A answers → reranked top careers with reasons
+4. **Roadmap generation** — gap analysis + user context → structured 4–6 milestone roadmap
+5. **Link validation** — resource URLs from the roadmap → plausibility assessment + replacement suggestions for any invalid URLs
 
 ## Environment Variables
 
@@ -170,6 +176,180 @@ Browser                  API Service              LLM (OpenAI)
   │   stats)                 │                        │
   │<─────────────────────────│                        │
 ```
+
+---
+
+### `GET /api/career-analysis`
+
+Runs the occupational matching algorithm against the current user's attribute profile and returns ranked matches with follow-up questions.
+
+**Success Response:** `200 OK`
+
+```json
+{
+  "matches": [
+    {
+      "occupation_id": "13-1111.00",
+      "occupation_name": "Management Analysts",
+      "match_count": 4,
+      "total_categories": 5,
+      "matched_categories": ["Abilities", "Knowledge", "Work Styles", "Basic Skills"]
+    }
+  ],
+  "follow_up_questions": [
+    "What kind of work environment do you prefer?",
+    "..."
+  ]
+}
+```
+
+**Error Responses:**
+
+| Status | Condition |
+|:---|:---|
+| `404` | No user profile in session (upload first) |
+
+---
+
+### `POST /api/career-analysis/refine`
+
+Refines the career matches using the user's answers to follow-up questions and/or free-text feedback.
+
+**Request Body:** `application/json`
+
+```json
+{
+  "answers": [
+    { "question": "What environment do you prefer?", "answer": "Remote" }
+  ],
+  "feedback": "I'm interested in data science roles"
+}
+```
+
+**Success Response:** `200 OK`
+
+```json
+{
+  "top_careers": [
+    {
+      "occupation_id": "15-2051.00",
+      "occupation_name": "Data Scientists",
+      "reason": "Strong alignment with your analytical skills and remote work preference"
+    }
+  ]
+}
+```
+
+**Error Responses:**
+
+| Status | Condition |
+|:---|:---|
+| `400` | No answers or feedback provided |
+| `400` | Fewer than 3 career matches to refine |
+| `404` | No user profile in session |
+| `500` | LLM call failure |
+
+---
+
+### `PUT /api/user/attributes/{attribute_id}`
+
+Manually overrides the capability score for a single user attribute.
+
+**Path parameter:** `attribute_id` — dotted attribute ID (e.g., `1.A.1.a.1`)
+
+**Request Body:** `application/json`
+
+```json
+{ "capability": 75.0 }
+```
+
+**Success Response:** `200 OK`
+
+```json
+{ "attribute_id": "1.A.1.a.1", "capability": 75.0 }
+```
+
+**Error Responses:**
+
+| Status | Condition |
+|:---|:---|
+| `400` | Capability not in [0, 100] |
+| `404` | No user profile, or attribute ID not found |
+
+---
+
+### `POST /api/career-roadmap`
+
+Generates a personalized career roadmap from the user's current role to a target occupation. Runs two sequential LLM calls: roadmap generation, then URL validation and patching.
+
+**Request Body:** `application/json`
+
+```json
+{
+  "occupation_id": "15-2051.00",
+  "occupation_name": "Data Scientists"
+}
+```
+
+**Success Response:** `200 OK`
+
+```json
+{
+  "roadmap_title": "From Management Analyst to Data Scientist",
+  "estimated_timeline_months": 18,
+  "summary": "A focused 18-month plan bridging your analytical foundation into data science...",
+  "milestones": [
+    {
+      "milestone_number": 1,
+      "title": "Build Python & Statistics Foundation",
+      "description": "...",
+      "timeline_months": "1-3",
+      "milestone_type": "skill_building",
+      "actions": [
+        {
+          "action_title": "Complete Python for Data Science",
+          "action_description": "...",
+          "action_type": "learn",
+          "resources": [
+            {
+              "resource_name": "Python for Everybody",
+              "resource_type": "course",
+              "url": "https://www.coursera.org/specializations/python",
+              "description": "Beginner Python specialization on Coursera"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Response fields:**
+
+| Field | Description |
+|:---|:---|
+| `roadmap_title` | Concise title for the transition |
+| `estimated_timeline_months` | Total realistic months for the full transition |
+| `summary` | 2–3 sentence overview of the strategy |
+| `milestones[]` | 4–6 ordered milestone objects |
+| `milestones[].milestone_type` | One of: `skill_building`, `certification`, `experience`, `networking`, `transition`, `advancement` |
+| `milestones[].actions[]` | 2–4 concrete actions per milestone |
+| `milestones[].actions[].action_type` | One of: `learn`, `certify`, `build`, `network`, `apply`, `practice` |
+| `milestones[].actions[].resources[]` | 2–3 resources per action with validated URLs |
+| `milestones[].actions[].resources[].resource_type` | One of: `course`, `book`, `community`, `tool`, `certification_program`, `website` |
+
+**URL validation:** After the roadmap is generated, a second LLM call validates every resource URL for plausibility (HTTPS, known domain, path matching resource name/type). Invalid URLs are replaced in-place before the response is returned. If URL validation fails, the original roadmap is returned unchanged.
+
+**Error Responses:**
+
+| Status | Condition |
+|:---|:---|
+| `404` | No user profile in session |
+| `404` | `occupation_id` not found in the O*NET database |
+| `500` | Roadmap generation LLM failure |
+
+---
 
 ## Planned Endpoints (Not Yet Implemented)
 
