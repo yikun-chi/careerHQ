@@ -21,9 +21,10 @@ def build_refine_career_schema() -> Dict[str, Any]:
                     "properties": {
                         "occupation_id": {"type": "string"},
                         "occupation_name": {"type": "string"},
-                        "reason": {"type": "string"},
+                        "profile_fit": {"type": "string"},
+                        "preference_fit": {"type": "string"},
                     },
-                    "required": ["occupation_id", "occupation_name", "reason"],
+                    "required": ["occupation_id", "occupation_name", "profile_fit", "preference_fit"],
                 },
             }
         },
@@ -39,7 +40,11 @@ def build_refine_career_instructions() -> str:
         "(2) optional free-text feedback from the user, and "
         "(3) optional follow-up answers about preferences, constraints, and goals.\n"
         "Pick exactly 3 best occupations from the provided list only.\n"
-        "For each pick, explain why it fits the user's profile and feedback/answers in 2-4 concise sentences.\n"
+        "For each pick, provide two explanations:\n"
+        "- profile_fit: 1-2 sentences on which matched attributes from the user's profile "
+        "(skills, abilities, work styles, etc.) make them a strong fit for this occupation.\n"
+        "- preference_fit: 1-2 sentences on how the career aligns with the user's "
+        "stated feedback and questionnaire answers.\n"
         "Do not invent occupations not present in the supplied list.\n"
         "Return only valid JSON matching the schema."
     )
