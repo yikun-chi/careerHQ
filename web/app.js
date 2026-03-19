@@ -3,6 +3,7 @@ const zone = document.getElementById("upload-zone");
 const fileInput = document.getElementById("file-input");
 
 let careerQuestionsData = [];
+let attrChatData = []; // flattened attribute list for chat Q&A
 
 function addMsg(html, cls) {
     const d = document.createElement("div");
@@ -130,7 +131,15 @@ function renderResults(data) {
     }
 
     if (data.attribute_sections) {
-        let html = '<h3>Profile Attributes <span class="edit-hint">(click scores to edit)</span></h3>';
+        // Store flat list for chat Q&A
+        attrChatData = [];
+        for (const section of data.attribute_sections) {
+            for (const a of section.attributes) {
+                attrChatData.push({ ...a, section: section.label });
+            }
+        }
+
+        let html = '<h3>Profile Attributes <span class="edit-hint">(click scores to edit, click names to learn more)</span></h3>';
         for (const section of data.attribute_sections) {
             if (!section.attributes.length) continue;
             html += '<div class="attr-section">';
@@ -138,15 +147,61 @@ function renderResults(data) {
             for (const a of section.attributes) {
                 const pct = Math.min(100, a.capability);
                 html += '<div class="attr-bar">';
-                html += '<span class="name" title="' + escAttr(a.description || a.attribute_id) + '">' + escHtml(a.name) + "</span>";
+                html += '<span class="name attr-name-link" title="' + escAttr(a.description || a.attribute_id)
+                    + '" data-attr-name="' + escAttr(a.name) + '">' + escHtml(a.name) + "</span>";
                 html += '<div class="bar-bg"><div class="bar-fill" style="width:' + pct + '%"></div></div>';
                 html += '<span class="value editable-value" data-attr-id="' + escAttr(a.attribute_id) + '">' + a.capability + "</span>";
                 html += "</div>";
             }
             html += "</div>";
         }
+
+        // Chat toggle button
+        html += '<div class="attr-chat-toggle">';
+        html += '<button class="secondary-btn" id="attr-chat-btn">? Ask about attributes</button>';
+        html += '</div>';
+
+        // Chat panel
+        html += '<div id="attr-chat-panel" class="attr-chat-panel" style="display:none;">';
+        html += '<div class="attr-chat-header"><span>Attribute Help</span><button class="attr-chat-close" id="attr-chat-close">&times;</button></div>';
+        html += '<div class="attr-chat-messages" id="attr-chat-messages">';
+        html += '<div class="attr-chat-msg bot">Click an attribute name above or ask a question like "What is Oral Comprehension?" or "How are scores calculated?"</div>';
+        html += '</div>';
+        html += '<div class="attr-chat-input-area">';
+        html += '<input type="text" id="attr-chat-input" placeholder="Ask about an attribute..." />';
+        html += '<button class="action-btn" id="attr-chat-send">Send</button>';
+        html += '</div>';
+        html += '</div>';
+
         const card = addCard(html);
         card.addEventListener("click", handleAttributeEdit);
+
+        // Chat panel toggle
+        document.getElementById("attr-chat-btn").addEventListener("click", () => {
+            const panel = document.getElementById("attr-chat-panel");
+            panel.style.display = panel.style.display === "none" ? "" : "none";
+        });
+        document.getElementById("attr-chat-close").addEventListener("click", () => {
+            document.getElementById("attr-chat-panel").style.display = "none";
+        });
+
+        // Send handler
+        document.getElementById("attr-chat-send").addEventListener("click", submitAttrChat);
+        document.getElementById("attr-chat-input").addEventListener("keydown", e => {
+            if (e.key === "Enter") submitAttrChat();
+        });
+
+        // Clickable attribute names
+        card.addEventListener("click", e => {
+            const nameEl = e.target.closest(".attr-name-link");
+            if (!nameEl) return;
+            const name = nameEl.dataset.attrName;
+            if (!name) return;
+            // Open panel and submit question
+            document.getElementById("attr-chat-panel").style.display = "";
+            document.getElementById("attr-chat-input").value = "What is " + name + "?";
+            submitAttrChat();
+        });
     }
 
     // Store career questions for later use but don't render them yet
@@ -429,12 +484,8 @@ function renderRefinedResults(data) {
         html += '<div class="refined-reason"><b>Profile fit:</b> ' + escHtml(career.profile_fit) + '</div>';
         html += '<div class="refined-reason"><b>Preference fit:</b> ' + escHtml(career.preference_fit) + '</div>';
         html += '</div>';
-        addCard(html);
-    });
-
-    const card = addCard(html);
-    card.querySelectorAll(".roadmap-btn").forEach(btn => {
-        btn.addEventListener("click", handleGenerateRoadmap);
+        const card = addCard(html);
+        card.querySelector(".roadmap-btn").addEventListener("click", handleGenerateRoadmap);
     });
 }
 
@@ -539,6 +590,104 @@ function renderRoadmap(data) {
     html += '</div>';
 
     addCard(html);
+}
+
+function submitAttrChat() {
+    const input = document.getElementById("attr-chat-input");
+    const query = input.value.trim();
+    if (!query) return;
+    input.value = "";
+
+    const msgs = document.getElementById("attr-chat-messages");
+    const userMsg = document.createElement("div");
+    userMsg.className = "attr-chat-msg user";
+    userMsg.textContent = query;
+    msgs.appendChild(userMsg);
+
+    const answer = answerAttributeQuestion(query);
+    const botMsg = document.createElement("div");
+    botMsg.className = "attr-chat-msg bot";
+    botMsg.innerHTML = answer;
+    msgs.appendChild(botMsg);
+    msgs.scrollTop = msgs.scrollHeight;
+}
+
+function answerAttributeQuestion(query) {
+    const q = query.toLowerCase().replace(/[?!.]/g, "").trim();
+
+    // Pattern 1: specific attribute lookup
+    const matchedAttr = findMatchingAttribute(q);
+    if (matchedAttr) {
+        let resp = "<b>" + escHtml(matchedAttr.name) + "</b> (" + escHtml(matchedAttr.section) + ")";
+        if (matchedAttr.description) {
+            resp += "<br><br>" + escHtml(matchedAttr.description);
+        }
+        resp += "<br><br><b>Your score:</b> " + matchedAttr.capability + " / 100";
+        if (matchedAttr.scale_anchors && matchedAttr.scale_anchors.length) {
+            resp += "<br><br><b>O*NET Level Examples:</b>";
+            for (const a of matchedAttr.scale_anchors) {
+                const approxScore = Math.round(a.level * 100 / 7);
+                resp += "<br>Level " + a.level + " (~" + approxScore + "/100): " + escHtml(a.description);
+            }
+        }
+        return resp;
+    }
+
+    // Pattern 2: score meaning
+    const scoreMatch = q.match(/(?:score|(\d+))/);
+    const numberMatch = q.match(/\b(\d+)\b/);
+    if (numberMatch && (q.includes("score") || q.includes("mean") || q.includes("level"))) {
+        const score = parseInt(numberMatch[1]);
+        const level = (score * 7 / 100).toFixed(1);
+        let resp = "A score of <b>" + score + "</b> out of 100 corresponds to roughly <b>level " + level + "</b> on the O*NET 1-7 scale.";
+        resp += "<br><br>Scores come from your work experience and resume bullet points. ";
+        resp += "Higher scores mean stronger demonstrated capability in that area.";
+
+        // Try to find bracketing anchors from any attribute
+        const anyWithAnchors = attrChatData.find(a => a.scale_anchors && a.scale_anchors.length);
+        if (anyWithAnchors) {
+            resp += "<br><br>For example, for <b>" + escHtml(anyWithAnchors.name) + "</b>:";
+            for (const a of anyWithAnchors.scale_anchors) {
+                const approxScore = Math.round(a.level * 100 / 7);
+                resp += "<br>Level " + a.level + " (~" + approxScore + "/100): " + escHtml(a.description);
+            }
+        }
+        return resp;
+    }
+
+    // Pattern 3: calculation explanation
+    if (q.includes("calculat") || q.includes("how") && (q.includes("score") || q.includes("work") || q.includes("comput"))) {
+        return "<b>How scores are calculated</b><br><br>"
+            + "Your attribute scores (0-100) are built in 3 phases:<br><br>"
+            + "<b>Phase 1 - Work Experience:</b> Each job maps to an O*NET occupation. "
+            + "The occupation's element scales (Level and Importance) are combined with your years of experience. "
+            + "More years in a role that heavily uses an ability = higher score.<br><br>"
+            + "<b>Phase 2 - Resume Bullets:</b> An AI reads each bullet point and maps it to relevant attributes "
+            + "with a relevance score (0-1). Your years at that job multiplied by relevance are added to the score.<br><br>"
+            + "<b>Phase 3 - Education:</b> Your highest education level sets binary flags for education-related attributes.<br><br>"
+            + "All scores are capped at 100. You can click any score to manually adjust it.";
+    }
+
+    // Fallback
+    return "I can help you understand your profile attributes. Try:<br>"
+        + "- Click an attribute name above (e.g., <b>Oral Comprehension</b>)<br>"
+        + '- Ask "What is [attribute name]?"<br>'
+        + '- Ask "What does a score of 75 mean?"<br>'
+        + '- Ask "How are scores calculated?"';
+}
+
+function findMatchingAttribute(q) {
+    // Try exact name match first, then substring
+    for (const a of attrChatData) {
+        if (q.includes(a.name.toLowerCase())) return a;
+    }
+    // Try partial word match
+    const words = q.split(/\s+/).filter(w => w.length > 3 && !["what", "tell", "about", "does", "mean", "this"].includes(w));
+    for (const a of attrChatData) {
+        const nameLower = a.name.toLowerCase();
+        if (words.some(w => nameLower.includes(w))) return a;
+    }
+    return null;
 }
 
 function escHtml(s) {

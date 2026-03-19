@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from packages.core.domain.attribute_info import load_scale_anchors
 from packages.core.domain.occupation_populate import load_occupations
 from packages.core.use_cases.process_resume import build_resume_parse_instructions
 
@@ -23,6 +24,7 @@ async def lifespan(app: FastAPI):
     app_state["occupations"] = load_occupations()
     app_state["resume_instructions"] = build_resume_parse_instructions()
     app_state["career_questions"] = json.loads(QUESTIONS_CONFIG_PATH.read_text())
+    app_state["scale_anchors"] = load_scale_anchors()
     yield
     app_state.clear()
 

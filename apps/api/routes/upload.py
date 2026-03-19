@@ -41,20 +41,24 @@ def _run_pipeline(tmp_path: str):
     return parsed, user, result
 
 
-def _build_attribute_sections(user: User):
+def _build_attribute_sections(user: User, scale_anchors: dict | None = None):
     """Build the 7 attribute sections with top 5 each."""
+    if scale_anchors is None:
+        scale_anchors = {}
     sections = []
     for label, prefix in ATTRIBUTE_SECTIONS:
         leaf_prefix = prefix + "."
         leaves = []
         for attr_id, attr in user.attributes.items():
             if attr_id.startswith(leaf_prefix) and attr.capability is not None and attr.capability > 0:
+                element_id = attr.mapping_element_id or attr_id
                 leaves.append({
                     "attribute_id": attr_id,
                     "name": attr.attribute_name,
                     "capability": round(attr.capability, 1),
                     "preference": round(attr.preference, 1) if attr.preference is not None else None,
                     "description": attr.description,
+                    "scale_anchors": scale_anchors.get(element_id, []),
                 })
         leaves.sort(key=lambda x: x["capability"], reverse=True)
         sections.append({
@@ -112,7 +116,7 @@ async def upload_resume(file: UploadFile):
         "jobs": jobs,
         "education": education,
         "resume_skills": parsed.skills,
-        "attribute_sections": _build_attribute_sections(user),
+        "attribute_sections": _build_attribute_sections(user, app_state.get("scale_anchors")),
         "stats": {
             "jobs_added": result.jobs_added,
             "bullets_mapped": result.bullets_mapped,
